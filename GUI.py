@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from Modulos import Ceros
-
 from Modulos import serie as sr
 
 # Funciones para abrir las ventanas de cada funcionalidad
@@ -21,7 +20,7 @@ def open_taylor_window():
     entry_degree = tk.Entry(window, width=50)
     entry_degree.pack(pady=10)
     save_button = tk.Button(window, text="Calcular",
-                            command=lambda: save_taylor(entry_function.get(),entry_x0.get(), entry_degree.get()))
+                            command=lambda: save_taylor(entry_function.get(), entry_x0.get(), entry_degree.get()))
     save_button.pack(pady=10)
 
 
@@ -129,9 +128,13 @@ def open_differential_eq_window():
 
 
 # Funciones para guardar los datos ingresados
-def save_taylor(function,x_0,degree):
-    funcion = sr.S_taylor(function,x_0,degree)
-    #print(f"Función: {function}, Grado: {degree}")
+def save_taylor(function, x_0, degree):
+    poli = sr.S_taylor(function, float(x_0), int(degree))
+    result_window = tk.Toplevel(root)
+    result_window.title("Resultado de la Serie de Taylor")
+    result_label = tk.Label(result_window, text=f"Función: {poli}\nGrado: {degree}")
+    result_label.pack(pady=10)
+    #print(f"Función: {poli}, Grado: {degree}")
 
 
 def save_zeros(function, interval, accuracy, method):
@@ -176,4 +179,3 @@ for i, (text, command) in enumerate(button_texts):
 
 # Iniciar el bucle principal de la interfaz gráfica
 root.mainloop()
-print("Hola")
