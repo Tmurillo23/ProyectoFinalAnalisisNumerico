@@ -134,7 +134,7 @@ def save_taylor(function, x_0, degree):
     result_window.title("Resultado de la Serie de Taylor")
     result_label = tk.Label(result_window, text=f"Función: {poli}\nGrado: {degree}")
     result_label.pack(pady=10)
-    #print(f"Función: {poli}, Grado: {degree}")
+    grafica = sr.grafica_polinomio(function, float(x_0), int(degree))
 
 
 def save_zeros(function, interval, accuracy, method):
