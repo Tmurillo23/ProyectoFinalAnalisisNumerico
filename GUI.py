@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
+from Modulos import Ceros
+
 from Modulos import serie as sr
 
 # Funciones para abrir las ventanas de cada funcionalidad
@@ -32,7 +34,7 @@ def open_zeros_window():
     entry_function = tk.Entry(window, width=50)
     entry_function.pack(pady=10)
 
-    label_interval = tk.Label(window, text="Intervalo o dato inicial:")
+    label_interval = tk.Label(window, text="Intervalo (si el método es diferente de  Newton) o dato inicial(si el método es Newton):")
     label_interval.pack(pady=10)
     entry_interval = tk.Entry(window, width=50)
     entry_interval.pack(pady=10)
@@ -133,6 +135,8 @@ def save_taylor(function,x_0,degree):
 
 
 def save_zeros(function, interval, accuracy, method):
+    if method == 'Bisección':
+        sol, cont = Modulos.Ceros()
     print(f"Función: {function}, Intervalo: {interval}, Exactitud: {accuracy}, Método: {method}")
 
 
