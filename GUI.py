@@ -176,3 +176,4 @@ for i, (text, command) in enumerate(button_texts):
 
 # Iniciar el bucle principal de la interfaz gráfica
 root.mainloop()
+print("Hola")
