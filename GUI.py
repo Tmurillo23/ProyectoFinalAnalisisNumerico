@@ -55,12 +55,12 @@ def open_linear_systems_window():
     window = tk.Toplevel(root)
     window.title("Sistemas de Ecuaciones Lineales")
 
-    label = tk.Label(window, text="Un sistema de ecuaciones lineales:")
+    label = tk.Label(window, text="Ingrese el sistema de ecuaciones lineales:")
     label.pack(pady=10)
     entry_system = tk.Entry(window, width=50)
     entry_system.pack(pady=10)
 
-    label_method = tk.Label(window, text="Método:")
+    label_method = tk.Label(window, text="Ingrese el método:")
     label_method.pack(pady=10)
     methods = ["Eliminación Gaussiana", "Pivoteo", "Gauss Seidel"]
     method_combobox = ttk.Combobox(window, values=methods)
@@ -75,7 +75,7 @@ def open_interpolation_window():
     window = tk.Toplevel(root)
     window.title("Interpolación y ajuste")
 
-    label = tk.Label(window, text="Solo los datos y el dato que se desee aproximar:")
+    label = tk.Label(window, text="Datos:")
     label.pack(pady=10)
     entry_data = tk.Entry(window, width=50)
     entry_data.pack(pady=10)
