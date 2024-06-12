@@ -96,7 +96,7 @@ def open_linear_systems_window():
     method_combobox.pack(pady=10)
     method_combobox.bind("<<ComboboxSelected>>", on_method_change)
 
-    global label_x0, entry_x0, label_tol, entry_to
+    global label_x0, entry_x0, label_tol, entry_tol
 
     label_x0 = tk.Label(window, text="Ingrese el vector x0:")
     entry_x0 = tk.Entry(window, width=50)
@@ -178,14 +178,17 @@ def save_zeros(function, interval, accuracy, method):
 def save_linear_systems(system, method, b, x0, tol):
     A = np.array(ast.literal_eval(system))
     B = np.array(ast.literal_eval(b))
-    X0 = np.array(ast.literal_eval(x0))
     match method:
         case "Eliminación Gaussiana":
             solution = se.Eliminacion_Gaussiana(A,B)
+            print(solution)
         case "Pivoteo":
-            pass
+            solution = se.pivoteo(A,B)
+            print(solution)
         case "Gauss Seidel":
+            X0 = np.array(ast.literal_eval(x0))
             solution = se.Gauss_s(A,B,X0,float(tol))
+            print(solution)
         case _:
             print("Seleccione un método correcto")
 
