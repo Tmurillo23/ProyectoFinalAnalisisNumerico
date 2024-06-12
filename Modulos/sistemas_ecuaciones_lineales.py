@@ -24,7 +24,25 @@ def Eliminacion_Gaussiana(A, b):
 
     #print('x=',x[0],'y=',x[1],'z=',x[2])
     return x
+def pivoteo(A,b):
+    n = len(b)
+    x = np.zeros(n)
 
+    for k in range(0, n - 1):
+        max_index = np.argmax(np.abs(A[k:, k])) + k
+        if max_index != k:
+            A[[k, max_index]] = A[[max_index, k]]
+            b[[k, max_index]] = b[[max_index, k]]
+
+        for i in range(k + 1, n):
+            lam = A[i][k] / A[k][k]
+            A[i, k:n] = A[i, k:n] - lam * A[k, k:n]
+            b[i] = b[i] - lam * b[k]
+
+    for k in range(n - 1, -1, -1):
+        x[k] = (b[k] - np.dot(A[k, k + 1:], x[k + 1:])) / A[k, k]
+
+    return x
 
 #Gauss - Seidel matricialmente
 #import numpy as np
@@ -65,7 +83,7 @@ def Gauss_s(A, b, xo, tol):
             x_it.append(x1)  #guarda el vector de las x en la iteracion i
             cont += 1
         #print(f'iteración: {cont}\n vector: {x1}\n error: {max(abs(x1 - xo))}')
-        return x_it
+        return x_it[-1]
     else:
         return f'El sistema iterativo no converge a la solución única del sistema'
 
@@ -123,3 +141,5 @@ def Gauss_s_sumas(A,b,xo,tol,M):
     #print(x1)
     return x1
 '''
+
+
