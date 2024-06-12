@@ -1,7 +1,9 @@
 from sympy import *
 import numpy as np
+import math
 from math import factorial
 import matplotlib.pyplot as plt
+from sympy.utilities.lambdify import lambdify
 #--------------------------
 x = symbols('x')
 #--------------
@@ -57,11 +59,17 @@ Grafica del polinomio vs la función
 
 """
 
-def grafica_polinomio(f,x0,n):
-    w = np.linspace(x0,1,100)
-    P = S_taylor(f,x0,n)
-    P = lambdify(x,P)
-    F = lambdify(x,f)
-    plt.plot(w,P(w),label = f'Polinomio de grado {n}')
-    plt.plot(w, F(w), 'r', label='Funcion')
+def grafica_polinomio(f,x0,xp,n):
+    x = symbols('x')
+    w = np.linspace(x0, xp, 100)
+    P = S_taylor(f, x0, n)
 
+    custom_funcs = {'acos': np.arccos, 'cos': np.cos, 'sin': np.sin, 'log': np.log, 'exp': np.exp}
+
+    P_lambdified = lambdify(x, P, modules=[custom_funcs, 'numpy'])
+    F_lambdified = lambdify(x, f, modules=[custom_funcs, 'numpy'])
+
+    plt.plot(w, P_lambdified(w), label=f'Polinomio de grado {n}')
+    plt.plot(w, F_lambdified(w), 'o', label='Función')
+    plt.legend()
+    plt.show()
