@@ -1,5 +1,4 @@
 import numpy as np
-import time
 
 def Eliminacion_Gaussiana(A,b):
     #------------------------
@@ -43,8 +42,7 @@ def Gauss_s(A,b,xo,tol):
     D= np.diag(np.diag(A))
     L=D-np.tril(A)
     U=D-np.triu(A)
-    
-    start_time = time.time()
+
     Tg=np.dot(np.linalg.inv(D-L),U) #(D-L)^-1 U
     Cg=np.dot(np.linalg.inv(D-L),b) #(D-L)^-1 b
     
@@ -65,17 +63,14 @@ def Gauss_s(A,b,xo,tol):
             x_it.append(x1) #guarda el vector de las x en la iteracion i
             cont+=1
         #print(f'iteración: {cont}\n vector: {x1}\n error: {max(abs(x1 - xo))}')
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        return x_it,radio
+        return x_it
     else:
-        print('El sistema iterativo no converge a la solución única del sistema')
+        return f'El sistema iterativo no converge a la solución única del sistema'
         
 def Gauss_s_sumas(A,b,xo,tol):
     n = len(b)
     error = [] #lista que guarda los errores en cada iteracion
-    
-    start_time = time.time()
+
     while True:
         for i in range(n):
             xo[i]=(b[i]-(np.dot(A[i,:],xo)-A[i][i]*xo[i]))/A[i][i]
@@ -83,10 +78,9 @@ def Gauss_s_sumas(A,b,xo,tol):
         error.append(abs(r[0]))
         if (np.abs(r[0])<=tol ):
             break
-    end_time = time.time()
-    elapsed_time = end_time - start_time
+
         
-    return xo, elapsed_time, error
+    return xo
         
 '''        
 #Gauss - Seidel con sumas (este no funciona, es muy inestable
