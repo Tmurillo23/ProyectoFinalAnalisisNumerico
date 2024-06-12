@@ -160,20 +160,76 @@ def open_interpolation_window():
                                                                method_combobox.get()))
     save_button.pack(pady=10)
 
+def on_number_of_equations_change(event):
+    try:
+        num_eqs = int(entry_num_eqs.get())
+        for widget in frame_equations.winfo_children():
+            widget.destroy()
+
+        for i in range(num_eqs):
+            label = tk.Label(frame_equations, text=f"Ecuación {i + 1}:")
+            label.grid(row=i, column=0, padx=5, pady=5)
+            entry = tk.Entry(frame_equations, width=50)
+            entry.grid(row=i, column=1, padx=5, pady=5)
+            equation_entries.append(entry)
+    except ValueError:
+        pass
+
+
+def on_number_of_conditions_change(event):
+    try:
+        num_conds = int(entry_num_conds.get())
+        for widget in frame_conditions.winfo_children():
+            widget.destroy()
+
+        for i in range(num_conds):
+            label = tk.Label(frame_conditions, text=f"Condición inicial {i + 1}:")
+            label.grid(row=i, column=0, padx=5, pady=5)
+            entry = tk.Entry(frame_conditions, width=50)
+            entry.grid(row=i, column=1, padx=5, pady=5)
+            condition_entries.append(entry)
+    except ValueError:
+        pass
+
+def show_solution_window(solution):
+    solution_window = tk.Toplevel(root)
+    solution_window.title("Solución")
+
+    label_solution = tk.Label(solution_window, text="Solución:")
+    label_solution.pack(pady=10)
+
+    solution_str = solution
+    entry_solution = tk.Entry(solution_window, width=50)
+    entry_solution.insert(0, solution_str)
+    entry_solution.config(state='readonly')
+    entry_solution.pack(pady=10)
 
 def open_differential_eq_window():
     window = tk.Toplevel(root)
     window.title("Ecuaciones Diferenciales")
 
-    label = tk.Label(window, text="La ecuación diferencial de primer orden:")
-    label.pack(pady=10)
-    entry_equation = tk.Entry(window, width=50)
-    entry_equation.pack(pady=10)
+    global entry_num_eqs, entry_num_conds, frame_equations, frame_conditions
+    global equation_entries, condition_entries
+    equation_entries = []
+    condition_entries = []
 
-    label_conditions = tk.Label(window, text="Condiciones iniciales:")
-    label_conditions.pack(pady=10)
-    entry_conditions = tk.Entry(window, width=50)
-    entry_conditions.pack(pady=10)
+    label_num_eqs = tk.Label(window, text="Número de ecuaciones diferenciales:")
+    label_num_eqs.pack(pady=10)
+    entry_num_eqs = tk.Entry(window, width=50)
+    entry_num_eqs.pack(pady=10)
+    entry_num_eqs.bind("<Return>", on_number_of_equations_change)
+
+    frame_equations = tk.Frame(window)
+    frame_equations.pack(pady=10)
+
+    label_num_conds = tk.Label(window, text="Número de condiciones iniciales:")
+    label_num_conds.pack(pady=10)
+    entry_num_conds = tk.Entry(window, width=50)
+    entry_num_conds.pack(pady=10)
+    entry_num_conds.bind("<Return>", on_number_of_conditions_change)
+
+    frame_conditions = tk.Frame(window)
+    frame_conditions.pack(pady=10)
 
     label_method = tk.Label(window, text="Método:")
     label_method.pack(pady=10)
@@ -182,11 +238,9 @@ def open_differential_eq_window():
     method_combobox.pack(pady=10)
 
     save_button = tk.Button(window, text="Resolver",
-                            command=lambda: save_differential_eq(entry_equation.get(), entry_conditions.get(),
+                            command=lambda: save_differential_eq(equation_entries, condition_entries,
                                                                  method_combobox.get()))
     save_button.pack(pady=10)
-
-
 # Funciones para guardar los datos ingresados
 def save_taylor(function, x_0, degree):
     poli = sr.S_taylor(function, float(x_0), int(degree))
@@ -226,8 +280,14 @@ def save_interpolation(data, approx, method):
     print(f"Datos: {data}, Aproximación: {approx}, Método: {method}")
 
 
-def save_differential_eq(equation, conditions, method):
-    print(f"Ecuación: {equation}, Condiciones Iniciales: {conditions}, Método: {method}")
+def save_differential_eq(equations, conditions, method):
+    eqs = [entry.get() for entry in equation_entries]
+    conds = [entry.get() for entry in condition_entries]
+    # Aquí puedes procesar las ecuaciones y condiciones
+    print(f"Ecuaciones: {eqs}")
+    print(f"Condiciones: {conds}")
+    print(f"Método: {method}")
+    show_solution_window("Solución de prueba")
 
 
 # Crear la ventana principal
