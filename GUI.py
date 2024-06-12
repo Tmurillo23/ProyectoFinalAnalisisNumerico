@@ -1,9 +1,12 @@
+import ast
 import tkinter as tk
+import numpy as np
 from tkinter import ttk
 import Modulos
 from Modulos import Ceros
 from Modulos import serie as sr
 from Modulos import sistemas_ecuaciones_lineales as se
+
 
 # Funciones para abrir las ventanas de cada funcionalidad
 def open_taylor_window():
@@ -35,7 +38,8 @@ def open_zeros_window():
     entry_function = tk.Entry(window, width=50)
     entry_function.pack(pady=10)
 
-    label_interval = tk.Label(window, text="Intervalo (si el método es diferente de  Newton) o dato inicial(si el método es Newton):")
+    label_interval = tk.Label(window,
+                              text="Intervalo (si el método es diferente de  Newton) o dato inicial(si el método es Newton):")
     label_interval.pack(pady=10)
     entry_interval = tk.Entry(window, width=50)
     entry_interval.pack(pady=10)
@@ -60,15 +64,11 @@ def open_zeros_window():
 def on_method_change(event):
     selected_method = method_combobox.get()
     if selected_method == "Gauss Seidel":
-        label_b.pack(pady=10)
-        entry_b.pack(pady=10)
         label_x0.pack(pady=10)
         entry_x0.pack(pady=10)
         label_tol.pack(pady=10)
         entry_tol.pack(pady=10)
     else:
-        label_b.pack_forget()
-        entry_b.pack_forget()
         label_x0.pack_forget()
         entry_x0.pack_forget()
         label_tol.pack_forget()
@@ -78,10 +78,15 @@ def open_linear_systems_window():
     window = tk.Toplevel(root)
     window.title("Sistemas de Ecuaciones Lineales")
 
-    label = tk.Label(window, text="Ingrese la matriz A:")
+    label = tk.Label(window, text="Ingrese el sistema de ecuaciones lineales:")
     label.pack(pady=10)
     entry_system = tk.Entry(window, width=50)
     entry_system.pack(pady=10)
+
+    label_b = tk.Label(window, text="Ingrese la matriz b:")
+    label_b.pack(pady=10)
+    entry_b = tk.Entry(window, width=50)
+    entry_b.pack(pady=10)
 
     label_method = tk.Label(window, text="Ingrese el método:")
     label_method.pack(pady=10)
@@ -91,9 +96,7 @@ def open_linear_systems_window():
     method_combobox.pack(pady=10)
     method_combobox.bind("<<ComboboxSelected>>", on_method_change)
 
-    global label_b, entry_b, label_x0, entry_x0, label_tol, entry_tol
-    label_b = tk.Label(window, text="Ingrese la matriz b:")
-    entry_b = tk.Entry(window, width=50)
+    global label_x0, entry_x0, label_tol, entry_to
 
     label_x0 = tk.Label(window, text="Ingrese el vector x0:")
     entry_x0 = tk.Entry(window, width=50)
@@ -103,7 +106,6 @@ def open_linear_systems_window():
 
     save_button = tk.Button(window, text="Resolver", command=lambda: save_linear_systems(entry_system.get(), method_combobox.get(), entry_b.get(), entry_x0.get(), entry_tol.get()))
     save_button.pack(pady=10)
-
 
 def open_interpolation_window():
     window = tk.Toplevel(root)
@@ -169,18 +171,21 @@ def save_taylor(function, x_0, degree):
 
 def save_zeros(function, interval, accuracy, method):
     if method == 'Bisección':
-        sol, cont = Modulos.Ceros()
+        sol, cont = Modulos.Ceros
     print(f"Función: {function}, Intervalo: {interval}, Exactitud: {accuracy}, Método: {method}")
 
 
 def save_linear_systems(system, method, b, x0, tol):
+    A = np.array(ast.literal_eval(system))
+    B = np.array(ast.literal_eval(b))
+    X0 = np.array(ast.literal_eval(x0))
     match method:
         case "Eliminación Gaussiana":
-            solution = se.Eliminacion_Gaussiana(system,b)
+            solution = se.Eliminacion_Gaussiana(A,B)
         case "Pivoteo":
             pass
         case "Gauss Seidel":
-            solution = se.Gauss_s(system,b,x0,tol)
+            solution = se.Gauss_s(A,B,X0,float(tol))
         case _:
             print("Seleccione un método correcto")
 
