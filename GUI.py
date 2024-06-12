@@ -105,7 +105,35 @@ def open_linear_systems_window():
     entry_tol = tk.Entry(window, width=50)
 
     save_button = tk.Button(window, text="Resolver", command=lambda: save_linear_systems(entry_system.get(), method_combobox.get(), entry_b.get(), entry_x0.get(), entry_tol.get()))
-    save_button.pack(pady=10)
+    save_button.pack(pady=10, side=tk.BOTTOM)
+
+
+def show_solution_window(solution):
+    solution_window = tk.Toplevel(root)
+    solution_window.title("Solución")
+
+    label_solution = tk.Label(solution_window, text="Solución:")
+    label_solution.pack(pady=10)
+
+    solution_str = ', '.join([str(s) for s in solution])
+    entry_solution = tk.Entry(solution_window, width=50)
+    entry_solution.insert(0, solution_str)
+    entry_solution.config(state='readonly')
+    entry_solution.pack(pady=10)
+
+
+def on_method_change(event):
+    selected_method = method_combobox.get()
+    if selected_method == "Gauss Seidel":
+        label_x0.pack(pady=10)
+        entry_x0.pack(pady=10)
+        label_tol.pack(pady=10)
+        entry_tol.pack(pady=10)
+    else:
+        label_x0.pack_forget()
+        entry_x0.pack_forget()
+        label_tol.pack_forget()
+        entry_tol.pack_forget()
 
 def open_interpolation_window():
     window = tk.Toplevel(root)
@@ -181,16 +209,17 @@ def save_linear_systems(system, method, b, x0, tol):
     match method:
         case "Eliminación Gaussiana":
             solution = se.Eliminacion_Gaussiana(A,B)
-            print(solution)
+            show_solution_window(solution)
         case "Pivoteo":
             solution = se.pivoteo(A,B)
-            print(solution)
+            show_solution_window(solution)
         case "Gauss Seidel":
             X0 = np.array(ast.literal_eval(x0))
             solution = se.Gauss_s(A,B,X0,float(tol))
-            print(solution)
+            show_solution_window(solution)
         case _:
             print("Seleccione un método correcto")
+
 
 
 def save_interpolation(data, approx, method):
