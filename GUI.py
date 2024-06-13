@@ -6,6 +6,7 @@ import Modulos
 from Modulos import Ceros
 from Modulos import serie as sr
 from Modulos import sistemas_ecuaciones_lineales as se
+from Modulos import ecuaciones_diferenciales as ed
 
 
 # Funciones para abrir las ventanas de cada funcionalidad
@@ -175,7 +176,6 @@ def on_number_of_equations_change(event):
     except ValueError:
         pass
 
-
 def on_number_of_conditions_change(event):
     try:
         num_conds = int(entry_num_conds.get())
@@ -190,7 +190,6 @@ def on_number_of_conditions_change(event):
             condition_entries.append(entry)
     except ValueError:
         pass
-
 def show_solution_window(solution):
     solution_window = tk.Toplevel(root)
     solution_window.title("Solución")
@@ -241,6 +240,7 @@ def open_differential_eq_window():
                             command=lambda: save_differential_eq(equation_entries, condition_entries,
                                                                  method_combobox.get()))
     save_button.pack(pady=10)
+
 # Funciones para guardar los datos ingresados
 def save_taylor(function, x_0, degree):
     poli = sr.S_taylor(function, float(x_0), int(degree))
@@ -279,16 +279,12 @@ def save_linear_systems(system, method, b, x0, tol):
 def save_interpolation(data, approx, method):
     print(f"Datos: {data}, Aproximación: {approx}, Método: {method}")
 
-
 def save_differential_eq(equations, conditions, method):
     eqs = [entry.get() for entry in equation_entries]
     conds = [entry.get() for entry in condition_entries]
     # Aquí puedes procesar las ecuaciones y condiciones
-    print(f"Ecuaciones: {eqs}")
-    print(f"Condiciones: {conds}")
-    print(f"Método: {method}")
+    solution =
     show_solution_window("Solución de prueba")
-
 
 # Crear la ventana principal
 root = tk.Tk()

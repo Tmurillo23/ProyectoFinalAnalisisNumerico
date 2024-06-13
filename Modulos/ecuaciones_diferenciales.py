@@ -30,3 +30,5 @@ def RungeKutta(f,a,b,h,c0):
         yrk.append(yn)
     return yrk,t
 
+def graficar(co,h):
+    pass
