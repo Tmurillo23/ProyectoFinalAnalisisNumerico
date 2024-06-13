@@ -32,11 +32,14 @@ def RungeKutta(f,a,b,h,c0):
         yrk.append(yn)
     return yrk,t
 
-def graficar(y_results,time):
+def graficar(y_results,time,cond):
     colors = ['b','g','r','c','m','y','k']
-    for i in range(len(y_results)):
-        num = random.randint(0,len(y_results)-1)
-        plt.plot(time,y_results[:,i],color=colors[num], label = f"función{i}")
+    if cond == 1:
+        plt.plot(time,y_results,color=colors[0], label = "Función")
+    else:
+        for i in range(cond):
+            num = random.randint(0,len(colors)-1)
+            plt.plot(time,np.array(y_results)[:,i],color=colors[num], label = f"función{i}")
     plt.xlabel('Tiempo')
     plt.title("Gráfica de la solución")
     plt.legend()
