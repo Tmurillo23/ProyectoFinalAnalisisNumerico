@@ -1,6 +1,8 @@
-# Euler
 import numpy as np
+import matplotlib.pyplot as plt
+import random
 
+# Euler
 def Euler(f,a,b,co,h):
     #----------------
     #f: funcion
@@ -30,5 +32,12 @@ def RungeKutta(f,a,b,h,c0):
         yrk.append(yn)
     return yrk,t
 
-def graficar(co,h):
-    pass
+def graficar(y_results,time):
+    colors = ['b','g','r','c','m','y','k']
+    for i in range(len(y_results)):
+        num = random.randint(0,len(y_results)-1)
+        plt.plot(time,y_results[:,i],color=colors[num], label = f"función{i}")
+    plt.xlabel('Tiempo')
+    plt.title("Gráfica de la solución")
+    plt.legend()
+    plt.show()
