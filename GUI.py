@@ -2,10 +2,11 @@ import ast
 import tkinter as tk
 import numpy as np
 from tkinter import ttk
+from tkinter import messagebox
 import Modulos
-from Modulos import Ceros
 from Modulos import serie as sr
 from Modulos import sistemas_ecuaciones_lineales as se
+import Modulos.Ceros
 from Modulos import ecuaciones_diferenciales as ed
 
 
@@ -40,7 +41,7 @@ def open_zeros_window():
     entry_function.pack(pady=10)
 
     label_interval = tk.Label(window,
-                              text="Intervalo (si el método es diferente de  Newton) o dato inicial(si el método es Newton):")
+                              text="Intervalo (si el método es diferente de Newton, ingréselo como una lista [a,b])\n o dato inicial (si el método es Newton, ingréselo como un valor normal):")
     label_interval.pack(pady=10)
     entry_interval = tk.Entry(window, width=50)
     entry_interval.pack(pady=10)
@@ -255,10 +256,48 @@ def save_taylor(function, x_0, degree):
     grafica = sr.grafica_polinomio(function, float(x_0), 1, int(degree))
 
 
+class InvalidIntervalError(Exception):
+    pass
+
+# funcion para verificar que el intervalo ingresado o el valor inicial son correctos y retornarlos
+def get_interval(entry_interval, method):
+    try:
+        interval = eval(entry_interval)
+    except:
+        raise InvalidIntervalError("Input inválido")
+
+    # Check if the result is a list
+    if method != "Newton":
+        if not(isinstance(interval, list) and len(interval) == 2):
+            raise InvalidIntervalError("Por favor ingrese una lista válida [a,b]")
+        return interval
+
+    else:
+        if not (isinstance(interval,(int, float))):
+            raise InvalidIntervalError("Por favor ingrese un número válido (entero o decimal)")
+        return interval
+
+
 def save_zeros(function, interval, accuracy, method):
-    if method == 'Bisección':
-        sol, cont = Modulos.Ceros
-    print(f"Función: {function}, Intervalo: {interval}, Exactitud: {accuracy}, Método: {method}")
+    ret_interval = get_interval(interval, method)
+
+    while True:
+        try:
+            ret_interval = get_interval(interval, method)
+            break
+
+        except InvalidIntervalError as e:
+            messagebox.showerror("Error", str(e))
+            return None
+
+    match method:
+        case "Bisección" | "Falsa Posición"| "Secante":
+            pass
+        case "Newton":
+            print("Newton")
+        case _:
+            print("Seleccione un método correcto")
+
 
 
 def save_linear_systems(system, method, b, x0, tol):
