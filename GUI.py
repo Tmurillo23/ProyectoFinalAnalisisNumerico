@@ -238,12 +238,6 @@ def open_differential_eq_window():
                                                                   entry_a.get(), entry_b.get(), entry_h.get()))
     save_button.pack(pady=10)
 
-# Configuración de la ventana principal
-root = tk.Tk()
-root.title("Solver de Ecuaciones Diferenciales")
-
-main_button = tk.Button(root, text="Abrir ventana de ecuaciones diferenciales", command=open_differential_eq_window)
-main_button.pack(pady=20)
 
 
 # Funciones para guardar los datos ingresados
@@ -322,33 +316,31 @@ def save_linear_systems(system, method, b, x0, tol):
 def save_interpolation(data, approx, method):
     print(f"Datos: {data}, Aproximación: {approx}, Método: {method}")
 
+
 def save_differential_eq(eq_entries, cond_entries, method, a, b, h):
-    equations = [entry.get() for entry in eq_entries]
+    equations = [eval(f"lambda x, y: {entry.get()}") for entry in eq_entries]
     conditions = [float(entry.get()) for entry in cond_entries]
     a = float(a)
     b = float(b)
     h = float(h)
+    co = np.array(conditions)
+
+    def f(t, y,eq=equations):
+        n = len(y)
+        F = np.zeros(n)
+        for i in range(n):
+            for j in range(len(eq)):
+                F[i] = eq[j](t, y[i])
+        return F
     match method:
         case "Euler de orden 4":
-            t, result = ed.Euler(eq_entries, a, b, cond_entries, h)
-            grafica = ed.graficar(result,t)
+            t, result = ed.Euler(f, a, b, co, h)
+            grafica = ed.graficar(result,t,len(conditions))
         case "Runge Kutta de orden 4":
-            t, result = ed.RungeKutta(eq_entries, a, b, h, cond_entries)
-            grafica = ed.graficar(result,t)
+            result,t = ed.RungeKutta(f, a, b, h, co)
+            grafica = ed.graficar(result,t,len(conditions))
         case _:
             print("Seleccione un método correcto")
-
-        # Mostrar resultados en una nueva ventana
-    result_window = tk.Toplevel(root)
-    result_window.title("Solución")
-
-    label_result = tk.Label(result_window, text="Solución:")
-    label_result.pack(pady=10)
-
-    result_str = f"Tiempo: {t}\nY(t): {result[:, 0]}\nYp(t): {result[:, 1]}"
-    result_text = tk.Text(result_window, height=15, width=80)
-    result_text.pack(pady=10)
-    result_text.insert(tk.END, result_str)
 
 # Crear la ventana principal
 root = tk.Tk()
