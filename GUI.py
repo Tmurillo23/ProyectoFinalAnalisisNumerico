@@ -4,10 +4,10 @@ import numpy as np
 from tkinter import ttk
 from tkinter import messagebox
 import Modulos
-from Modulos import Ceros
 from Modulos import serie as sr
 from Modulos import sistemas_ecuaciones_lineales as se
 import Modulos.Ceros
+from Modulos import ecuaciones_diferenciales as ed
 
 
 # Funciones para abrir las ventanas de cada funcionalidad
@@ -62,19 +62,6 @@ def open_zeros_window():
                                                        method_combobox.get()))
     save_button.pack(pady=10)
 
-
-def on_method_change(event):
-    selected_method = method_combobox.get()
-    if selected_method == "Gauss Seidel":
-        label_x0.pack(pady=10)
-        entry_x0.pack(pady=10)
-        label_tol.pack(pady=10)
-        entry_tol.pack(pady=10)
-    else:
-        label_x0.pack_forget()
-        entry_x0.pack_forget()
-        label_tol.pack_forget()
-        entry_tol.pack_forget()
 
 def open_linear_systems_window():
     window = tk.Toplevel(root)
@@ -162,76 +149,83 @@ def open_interpolation_window():
                                                                method_combobox.get()))
     save_button.pack(pady=10)
 
-def on_number_of_equations_change(event):
+def on_num_eq_change(event):
     try:
-        num_eqs = int(entry_num_eqs.get())
-        for widget in frame_equations.winfo_children():
-            widget.destroy()
+        num_eq = int(entry_num_eq.get())
+        if num_eq <= 0:
+            raise ValueError("El número de ecuaciones debe ser un entero positivo.")
+    except ValueError as e:
+        messagebox.showerror("Error", str(e))
+        return
 
-        for i in range(num_eqs):
-            label = tk.Label(frame_equations, text=f"Ecuación {i + 1}:")
-            label.grid(row=i, column=0, padx=5, pady=5)
-            entry = tk.Entry(frame_equations, width=50)
-            entry.grid(row=i, column=1, padx=5, pady=5)
-            equation_entries.append(entry)
-    except ValueError:
-        pass
+    for widget in frame_eq.winfo_children():
+        widget.destroy()
+    for i in range(num_eq):
+        label_eq = tk.Label(frame_eq, text=f"Ecuación {i+1}:")
+        label_eq.grid(row=i, column=0, pady=5)
+        entry_eq = tk.Entry(frame_eq, width=50)
+        entry_eq.grid(row=i, column=1, pady=5)
+        eq_entries.append(entry_eq)
 
-
-def on_number_of_conditions_change(event):
+def on_num_cond_change(event):
     try:
-        num_conds = int(entry_num_conds.get())
-        for widget in frame_conditions.winfo_children():
-            widget.destroy()
+        num_cond = int(entry_num_cond.get())
+        if num_cond <= 0:
+            raise ValueError("El número de condiciones iniciales debe ser un entero positivo.")
+    except ValueError as e:
+        messagebox.showerror("Error", str(e))
+        return
 
-        for i in range(num_conds):
-            label = tk.Label(frame_conditions, text=f"Condición inicial {i + 1}:")
-            label.grid(row=i, column=0, padx=5, pady=5)
-            entry = tk.Entry(frame_conditions, width=50)
-            entry.grid(row=i, column=1, padx=5, pady=5)
-            condition_entries.append(entry)
-    except ValueError:
-        pass
-
-def show_solution_window(solution):
-    solution_window = tk.Toplevel(root)
-    solution_window.title("Solución")
-
-    label_solution = tk.Label(solution_window, text="Solución:")
-    label_solution.pack(pady=10)
-
-    solution_str = solution
-    entry_solution = tk.Entry(solution_window, width=50)
-    entry_solution.insert(0, solution_str)
-    entry_solution.config(state='readonly')
-    entry_solution.pack(pady=10)
+    for widget in frame_cond.winfo_children():
+        widget.destroy()
+    for i in range(num_cond):
+        label_cond = tk.Label(frame_cond, text=f"Condición {i+1}:")
+        label_cond.grid(row=i, column=0, pady=5)
+        entry_cond = tk.Entry(frame_cond, width=50)
+        entry_cond.grid(row=i, column=1, pady=5)
+        cond_entries.append(entry_cond)
 
 def open_differential_eq_window():
     window = tk.Toplevel(root)
     window.title("Ecuaciones Diferenciales")
 
-    global entry_num_eqs, entry_num_conds, frame_equations, frame_conditions
-    global equation_entries, condition_entries
-    equation_entries = []
-    condition_entries = []
+    global entry_num_eq, frame_eq, eq_entries, entry_num_cond, frame_cond, cond_entries
+    eq_entries = []
+    cond_entries = []
 
-    label_num_eqs = tk.Label(window, text="Número de ecuaciones diferenciales:")
-    label_num_eqs.pack(pady=10)
-    entry_num_eqs = tk.Entry(window, width=50)
-    entry_num_eqs.pack(pady=10)
-    entry_num_eqs.bind("<Return>", on_number_of_equations_change)
+    label_num_eq = tk.Label(window, text="Número de ecuaciones diferenciales:")
+    label_num_eq.pack(pady=10)
+    entry_num_eq = tk.Entry(window, width=10)
+    entry_num_eq.pack(pady=10)
+    entry_num_eq.bind("<Return>", on_num_eq_change)
 
-    frame_equations = tk.Frame(window)
-    frame_equations.pack(pady=10)
+    frame_eq = tk.Frame(window)
+    frame_eq.pack(pady=10)
 
-    label_num_conds = tk.Label(window, text="Número de condiciones iniciales:")
-    label_num_conds.pack(pady=10)
-    entry_num_conds = tk.Entry(window, width=50)
-    entry_num_conds.pack(pady=10)
-    entry_num_conds.bind("<Return>", on_number_of_conditions_change)
+    label_num_cond = tk.Label(window, text="Número de condiciones iniciales:")
+    label_num_cond.pack(pady=10)
+    entry_num_cond = tk.Entry(window, width=10)
+    entry_num_cond.pack(pady=10)
+    entry_num_cond.bind("<Return>", on_num_cond_change)
 
-    frame_conditions = tk.Frame(window)
-    frame_conditions.pack(pady=10)
+    frame_cond = tk.Frame(window)
+    frame_cond.pack(pady=10)
+
+    # Labels and entries for a, b, h
+    label_a = tk.Label(window, text="a:")
+    label_a.pack(pady=5)
+    entry_a = tk.Entry(window, width=10)
+    entry_a.pack(pady=5)
+
+    label_b = tk.Label(window, text="b:")
+    label_b.pack(pady=5)
+    entry_b = tk.Entry(window, width=10)
+    entry_b.pack(pady=5)
+
+    label_h = tk.Label(window, text="h:")
+    label_h.pack(pady=5)
+    entry_h = tk.Entry(window, width=10)
+    entry_h.pack(pady=5)
 
     label_method = tk.Label(window, text="Método:")
     label_method.pack(pady=10)
@@ -240,14 +234,27 @@ def open_differential_eq_window():
     method_combobox.pack(pady=10)
 
     save_button = tk.Button(window, text="Resolver",
-                            command=lambda: save_differential_eq(equation_entries, condition_entries,
-                                                                 method_combobox.get()))
+                            command=lambda: save_differential_eq(eq_entries, cond_entries,
+                                                                  method_combobox.get(),
+                                                                  entry_a.get(), entry_b.get(), entry_h.get()))
     save_button.pack(pady=10)
 
 
 # Funciones para guardar los datos ingresados
 def save_taylor(function, x_0, degree):
-    poli = sr.S_taylor(function, float(x_0), int(degree))
+    try:
+        float(x_0)
+        int(degree)
+    except ValueError:
+        messagebox.showerror("Error", "Por favor ingrese valores numéricos válidos para x_0 y el grado.")
+        return
+
+    try:
+        poli = sr.S_taylor(function, float(x_0), int(degree))
+    except Exception as e:
+        messagebox.showerror("Error", f"Se produjo un error al calcular la serie de Taylor: {e}")
+        return
+
     result_window = tk.Toplevel(root)
     result_window.title("Resultado de la Serie de Taylor")
     result_label = tk.Label(result_window, text=f"Función: {poli}\nGrado: {degree}")
@@ -258,19 +265,17 @@ def save_taylor(function, x_0, degree):
 class InvalidIntervalError(Exception):
     pass
 
-# funcion para verificar que el intervalo ingresado o el valor inicial son correctos y retornarlos
+# Función para verificar que el intervalo ingresado o el valor inicial son correctos y retornarlos
 def get_interval(entry_interval, method):
     try:
         interval = eval(entry_interval)
     except:
         raise InvalidIntervalError("Input inválido")
-    
-    # Check if the result is a list
+
     if method != "Newton":
         if not(isinstance(interval, list) and len(interval) == 2):
             raise InvalidIntervalError("Por favor ingrese una lista válida [a,b]")
         return interval
-    
     else:
         if not (isinstance(interval,(int, float))):
             raise InvalidIntervalError("Por favor ingrese un número válido (entero o decimal)")
@@ -287,54 +292,122 @@ def save_zeros(function, interval, accuracy, method):
 
         except InvalidIntervalError as e:
             messagebox.showerror("Error", str(e))
+            return None
 
     match method:
         case "Bisección" | "Falsa Posición"| "Secante":
-            f = eval(f"lambda x: {function}", {"np": np})
-            print(f(0))
-            #print(type(function))
-            #f = lambda x: function
-            #sol = Modulos.Ceros.biseccion(f, ret_interval[0], ret_interval[1], accuracy)
-            #print(sol)
             pass            
         case "Newton":
             print("Newton")
         case _:
-            print("Seleccione un método correcto")
-
+            messagebox.showerror("Error", "Seleccione un método válido.")
 
 
 def save_linear_systems(system, method, b, x0, tol):
-    A = np.array(ast.literal_eval(system))
-    B = np.array(ast.literal_eval(b))
+    try:
+        A = np.array(ast.literal_eval(system))
+        B = np.array(ast.literal_eval(b))
+    except (ValueError, SyntaxError):
+        messagebox.showerror("Error", "Por favor ingrese una matriz válida para el sistema de ecuaciones o b.")
+        return
+
+    if method == "Gauss Seidel":
+        try:
+            X0 = np.array(ast.literal_eval(x0))
+            tol = float(tol)
+        except (ValueError, SyntaxError):
+            messagebox.showerror("Error", "Por favor ingrese un vector x0 válido y un valor numérico válido para la tolerancia.")
+            return
+
     match method:
         case "Eliminación Gaussiana":
-            solution = se.Eliminacion_Gaussiana(A,B)
-            show_solution_window(solution)
+            try:
+                solution = se.Eliminacion_Gaussiana(A, B)
+                show_solution_window(solution)
+            except Exception as e:
+                messagebox.showerror("Error", f"Se produjo un error al resolver el sistema: {e}")
         case "Pivoteo":
-            solution = se.pivoteo(A,B)
-            show_solution_window(solution)
+            try:
+                solution = se.pivoteo(A, B)
+                show_solution_window(solution)
+            except Exception as e:
+                messagebox.showerror("Error", f"Se produjo un error al resolver el sistema: {e}")
         case "Gauss Seidel":
-            X0 = np.array(ast.literal_eval(x0))
-            solution = se.Gauss_s(A,B,X0,float(tol))
-            show_solution_window(solution)
+            try:
+                solution = se.Gauss_s(A, B, X0, tol)
+                show_solution_window(solution)
+            except Exception as e:
+                messagebox.showerror("Error", f"Se produjo un error al resolver el sistema: {e}")
         case _:
-            print("Seleccione un método correcto")
-
+            messagebox.showerror("Error", "Seleccione un método válido.")
 
 
 def save_interpolation(data, approx, method):
-    print(f"Datos: {data}, Aproximación: {approx}, Método: {method}")
+    try:
+        data = ast.literal_eval(data)
+        if not isinstance(data, list):
+            raise ValueError
+    except (ValueError, SyntaxError):
+        messagebox.showerror("Error", "Por favor ingrese una lista válida para los datos.")
+        return
+
+    try:
+        approx = float(approx)
+    except ValueError:
+        messagebox.showerror("Error", "Por favor ingrese un valor numérico válido para la aproximación.")
+        return
+
+    match method:
+        case "Polinomial simple":
+            pass
+        case "Lagrange":
+            pass
+        case "Mínimos cuadrados":
+            pass
+        case _:
+            messagebox.showerror("Error", "Seleccione un método válido.")
 
 
-def save_differential_eq(equations, conditions, method):
-    eqs = [entry.get() for entry in equation_entries]
-    conds = [entry.get() for entry in condition_entries]
-    # Aquí puedes procesar las ecuaciones y condiciones
-    print(f"Ecuaciones: {eqs}")
-    print(f"Condiciones: {conds}")
-    print(f"Método: {method}")
-    show_solution_window("Solución de prueba")
+def save_differential_eq(eq_entries, cond_entries, method, a, b, h):
+    if len(eq_entries) == 0 or len(cond_entries) == 0:
+        messagebox.showerror("Error", "El número de ecuaciones y el número de condiciones iniciales no pueden ser cero.")
+        return
+
+    try:
+        equations = [eval(f"lambda x, y: {entry.get()}") for entry in eq_entries]
+        conditions = [float(entry.get()) for entry in cond_entries]
+        a = float(a)
+        b = float(b)
+        h = float(h)
+    except ValueError:
+        messagebox.showerror("Error", "Por favor ingrese valores numéricos válidos para las condiciones iniciales, a, b y h.")
+        return
+
+    co = np.array(conditions)
+
+    def f(t, y, eq=equations):
+        n = len(y)
+        F = np.zeros(n)
+        for i in range(n):
+            for j in range(len(eq)):
+                F[i] = eq[j](t, y[i])
+        return F
+
+    match method:
+        case "Euler de orden 4":
+            try:
+                t, result = ed.Euler(f, a, b, co, h)
+                grafica = ed.graficar(result, t, len(conditions))
+            except Exception as e:
+                messagebox.showerror("Error", f"Se produjo un error al resolver la ecuación diferencial: {e}")
+        case "Runge Kutta de orden 4":
+            try:
+                result, t = ed.RungeKutta(f, a, b, h, co)
+                grafica = ed.graficar(result, t, len(conditions))
+            except Exception as e:
+                messagebox.showerror("Error", f"Se produjo un error al resolver la ecuación diferencial: {e}")
+        case _:
+            messagebox.showerror("Error", "Seleccione un método válido.")
 
 
 # Crear la ventana principal
