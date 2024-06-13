@@ -287,10 +287,15 @@ def save_zeros(function, interval, accuracy, method):
 
         except InvalidIntervalError as e:
             messagebox.showerror("Error", str(e))
-            return None
 
     match method:
         case "Bisección" | "Falsa Posición"| "Secante":
+            f = eval(f"lambda x: {function}", {"np": np})
+            print(f(0))
+            #print(type(function))
+            #f = lambda x: function
+            #sol = Modulos.Ceros.biseccion(f, ret_interval[0], ret_interval[1], accuracy)
+            #print(sol)
             pass            
         case "Newton":
             print("Newton")
