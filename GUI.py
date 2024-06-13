@@ -63,19 +63,6 @@ def open_zeros_window():
     save_button.pack(pady=10)
 
 
-def on_method_change(event):
-    selected_method = method_combobox.get()
-    if selected_method == "Gauss Seidel":
-        label_x0.pack(pady=10)
-        entry_x0.pack(pady=10)
-        label_tol.pack(pady=10)
-        entry_tol.pack(pady=10)
-    else:
-        label_x0.pack_forget()
-        entry_x0.pack_forget()
-        label_tol.pack_forget()
-        entry_tol.pack_forget()
-
 def open_linear_systems_window():
     window = tk.Toplevel(root)
     window.title("Sistemas de Ecuaciones Lineales")
@@ -163,7 +150,14 @@ def open_interpolation_window():
     save_button.pack(pady=10)
 
 def on_num_eq_change(event):
-    num_eq = int(entry_num_eq.get())
+    try:
+        num_eq = int(entry_num_eq.get())
+        if num_eq <= 0:
+            raise ValueError("El número de ecuaciones debe ser un entero positivo.")
+    except ValueError as e:
+        messagebox.showerror("Error", str(e))
+        return
+
     for widget in frame_eq.winfo_children():
         widget.destroy()
     for i in range(num_eq):
@@ -174,7 +168,14 @@ def on_num_eq_change(event):
         eq_entries.append(entry_eq)
 
 def on_num_cond_change(event):
-    num_cond = int(entry_num_cond.get())
+    try:
+        num_cond = int(entry_num_cond.get())
+        if num_cond <= 0:
+            raise ValueError("El número de condiciones iniciales debe ser un entero positivo.")
+    except ValueError as e:
+        messagebox.showerror("Error", str(e))
+        return
+
     for widget in frame_cond.winfo_children():
         widget.destroy()
     for i in range(num_cond):
@@ -239,10 +240,21 @@ def open_differential_eq_window():
     save_button.pack(pady=10)
 
 
-
 # Funciones para guardar los datos ingresados
 def save_taylor(function, x_0, degree):
-    poli = sr.S_taylor(function, float(x_0), int(degree))
+    try:
+        float(x_0)
+        int(degree)
+    except ValueError:
+        messagebox.showerror("Error", "Por favor ingrese valores numéricos válidos para x_0 y el grado.")
+        return
+
+    try:
+        poli = sr.S_taylor(function, float(x_0), int(degree))
+    except Exception as e:
+        messagebox.showerror("Error", f"Se produjo un error al calcular la serie de Taylor: {e}")
+        return
+
     result_window = tk.Toplevel(root)
     result_window.title("Resultado de la Serie de Taylor")
     result_label = tk.Label(result_window, text=f"Función: {poli}\nGrado: {degree}")
@@ -253,19 +265,17 @@ def save_taylor(function, x_0, degree):
 class InvalidIntervalError(Exception):
     pass
 
-# funcion para verificar que el intervalo ingresado o el valor inicial son correctos y retornarlos
+# Función para verificar que el intervalo ingresado o el valor inicial son correctos y retornarlos
 def get_interval(entry_interval, method):
     try:
         interval = eval(entry_interval)
     except:
         raise InvalidIntervalError("Input inválido")
 
-    # Check if the result is a list
     if method != "Newton":
         if not(isinstance(interval, list) and len(interval) == 2):
             raise InvalidIntervalError("Por favor ingrese una lista válida [a,b]")
         return interval
-
     else:
         if not (isinstance(interval,(int, float))):
             raise InvalidIntervalError("Por favor ingrese un número válido (entero o decimal)")
@@ -273,74 +283,133 @@ def get_interval(entry_interval, method):
 
 
 def save_zeros(function, interval, accuracy, method):
-    ret_interval = get_interval(interval, method)
+    try:
+        ret_interval = get_interval(interval, method)
+    except InvalidIntervalError as e:
+        messagebox.showerror("Error", str(e))
+        return
 
-    while True:
-        try:
-            ret_interval = get_interval(interval, method)
-            break
-
-        except InvalidIntervalError as e:
-            messagebox.showerror("Error", str(e))
-            return None
+    try:
+        accuracy = float(accuracy)
+    except ValueError:
+        messagebox.showerror("Error", "Por favor ingrese un valor numérico válido para la exactitud.")
+        return
 
     match method:
-        case "Bisección" | "Falsa Posición"| "Secante":
+        case "Bisección" | "Falsa Posición" | "Secante":
             pass
         case "Newton":
             print("Newton")
         case _:
-            print("Seleccione un método correcto")
-
+            messagebox.showerror("Error", "Seleccione un método válido.")
 
 
 def save_linear_systems(system, method, b, x0, tol):
-    A = np.array(ast.literal_eval(system))
-    B = np.array(ast.literal_eval(b))
+    try:
+        A = np.array(ast.literal_eval(system))
+        B = np.array(ast.literal_eval(b))
+    except (ValueError, SyntaxError):
+        messagebox.showerror("Error", "Por favor ingrese una matriz válida para el sistema de ecuaciones o b.")
+        return
+
+    if method == "Gauss Seidel":
+        try:
+            X0 = np.array(ast.literal_eval(x0))
+            tol = float(tol)
+        except (ValueError, SyntaxError):
+            messagebox.showerror("Error", "Por favor ingrese un vector x0 válido y un valor numérico válido para la tolerancia.")
+            return
+
     match method:
         case "Eliminación Gaussiana":
-            solution = se.Eliminacion_Gaussiana(A,B)
-            show_solution_window(solution)
+            try:
+                solution = se.Eliminacion_Gaussiana(A, B)
+                show_solution_window(solution)
+            except Exception as e:
+                messagebox.showerror("Error", f"Se produjo un error al resolver el sistema: {e}")
         case "Pivoteo":
-            solution = se.pivoteo(A,B)
-            show_solution_window(solution)
+            try:
+                solution = se.pivoteo(A, B)
+                show_solution_window(solution)
+            except Exception as e:
+                messagebox.showerror("Error", f"Se produjo un error al resolver el sistema: {e}")
         case "Gauss Seidel":
-            X0 = np.array(ast.literal_eval(x0))
-            solution = se.Gauss_s(A,B,X0,float(tol))
-            show_solution_window(solution)
+            try:
+                solution = se.Gauss_s(A, B, X0, tol)
+                show_solution_window(solution)
+            except Exception as e:
+                messagebox.showerror("Error", f"Se produjo un error al resolver el sistema: {e}")
         case _:
-            print("Seleccione un método correcto")
-
+            messagebox.showerror("Error", "Seleccione un método válido.")
 
 
 def save_interpolation(data, approx, method):
-    print(f"Datos: {data}, Aproximación: {approx}, Método: {method}")
+    try:
+        data = ast.literal_eval(data)
+        if not isinstance(data, list):
+            raise ValueError
+    except (ValueError, SyntaxError):
+        messagebox.showerror("Error", "Por favor ingrese una lista válida para los datos.")
+        return
+
+    try:
+        approx = float(approx)
+    except ValueError:
+        messagebox.showerror("Error", "Por favor ingrese un valor numérico válido para la aproximación.")
+        return
+
+    match method:
+        case "Polinomial simple":
+            pass
+        case "Lagrange":
+            pass
+        case "Mínimos cuadrados":
+            pass
+        case _:
+            messagebox.showerror("Error", "Seleccione un método válido.")
 
 
 def save_differential_eq(eq_entries, cond_entries, method, a, b, h):
-    equations = [eval(f"lambda x, y: {entry.get()}") for entry in eq_entries]
-    conditions = [float(entry.get()) for entry in cond_entries]
-    a = float(a)
-    b = float(b)
-    h = float(h)
+    if len(eq_entries) == 0 or len(cond_entries) == 0:
+        messagebox.showerror("Error", "El número de ecuaciones y el número de condiciones iniciales no pueden ser cero.")
+        return
+
+    try:
+        equations = [eval(f"lambda x, y: {entry.get()}") for entry in eq_entries]
+        conditions = [float(entry.get()) for entry in cond_entries]
+        a = float(a)
+        b = float(b)
+        h = float(h)
+    except ValueError:
+        messagebox.showerror("Error", "Por favor ingrese valores numéricos válidos para las condiciones iniciales, a, b y h.")
+        return
+
     co = np.array(conditions)
 
-    def f(t, y,eq=equations):
+    def f(t, y, eq=equations):
         n = len(y)
         F = np.zeros(n)
         for i in range(n):
             for j in range(len(eq)):
                 F[i] = eq[j](t, y[i])
         return F
+
     match method:
         case "Euler de orden 4":
-            t, result = ed.Euler(f, a, b, co, h)
-            grafica = ed.graficar(result,t,len(conditions))
+            try:
+                t, result = ed.Euler(f, a, b, co, h)
+                grafica = ed.graficar(result, t, len(conditions))
+            except Exception as e:
+                messagebox.showerror("Error", f"Se produjo un error al resolver la ecuación diferencial: {e}")
         case "Runge Kutta de orden 4":
-            result,t = ed.RungeKutta(f, a, b, h, co)
-            grafica = ed.graficar(result,t,len(conditions))
+            try:
+                result, t = ed.RungeKutta(f, a, b, h, co)
+                grafica = ed.graficar(result, t, len(conditions))
+            except Exception as e:
+                messagebox.showerror("Error", f"Se produjo un error al resolver la ecuación diferencial: {e}")
         case _:
-            print("Seleccione un método correcto")
+            messagebox.showerror("Error", "Seleccione un método válido.")
+
 
 # Crear la ventana principal
 root = tk.Tk()
