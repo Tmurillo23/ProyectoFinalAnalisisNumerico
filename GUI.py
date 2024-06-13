@@ -161,74 +161,69 @@ def open_interpolation_window():
                                                                method_combobox.get()))
     save_button.pack(pady=10)
 
-def on_number_of_equations_change(event):
-    try:
-        num_eqs = int(entry_num_eqs.get())
-        for widget in frame_equations.winfo_children():
-            widget.destroy()
+def on_num_eq_change(event):
+    num_eq = int(entry_num_eq.get())
+    for widget in frame_eq.winfo_children():
+        widget.destroy()
+    for i in range(num_eq):
+        label_eq = tk.Label(frame_eq, text=f"Ecuación {i+1}:")
+        label_eq.grid(row=i, column=0, pady=5)
+        entry_eq = tk.Entry(frame_eq, width=50)
+        entry_eq.grid(row=i, column=1, pady=5)
+        eq_entries.append(entry_eq)
 
-        for i in range(num_eqs):
-            label = tk.Label(frame_equations, text=f"Ecuación {i + 1}:")
-            label.grid(row=i, column=0, padx=5, pady=5)
-            entry = tk.Entry(frame_equations, width=50)
-            entry.grid(row=i, column=1, padx=5, pady=5)
-            equation_entries.append(entry)
-    except ValueError:
-        pass
-
-def on_number_of_conditions_change(event):
-    try:
-        num_conds = int(entry_num_conds.get())
-        for widget in frame_conditions.winfo_children():
-            widget.destroy()
-
-        for i in range(num_conds):
-            label = tk.Label(frame_conditions, text=f"Condición inicial {i + 1}:")
-            label.grid(row=i, column=0, padx=5, pady=5)
-            entry = tk.Entry(frame_conditions, width=50)
-            entry.grid(row=i, column=1, padx=5, pady=5)
-            condition_entries.append(entry)
-    except ValueError:
-        pass
-def show_solution_window(solution):
-    solution_window = tk.Toplevel(root)
-    solution_window.title("Solución")
-
-    label_solution = tk.Label(solution_window, text="Solución:")
-    label_solution.pack(pady=10)
-
-    solution_str = solution
-    entry_solution = tk.Entry(solution_window, width=50)
-    entry_solution.insert(0, solution_str)
-    entry_solution.config(state='readonly')
-    entry_solution.pack(pady=10)
+def on_num_cond_change(event):
+    num_cond = int(entry_num_cond.get())
+    for widget in frame_cond.winfo_children():
+        widget.destroy()
+    for i in range(num_cond):
+        label_cond = tk.Label(frame_cond, text=f"Condición {i+1}:")
+        label_cond.grid(row=i, column=0, pady=5)
+        entry_cond = tk.Entry(frame_cond, width=50)
+        entry_cond.grid(row=i, column=1, pady=5)
+        cond_entries.append(entry_cond)
 
 def open_differential_eq_window():
     window = tk.Toplevel(root)
     window.title("Ecuaciones Diferenciales")
 
-    global entry_num_eqs, entry_num_conds, frame_equations, frame_conditions
-    global equation_entries, condition_entries
-    equation_entries = []
-    condition_entries = []
+    global entry_num_eq, frame_eq, eq_entries, entry_num_cond, frame_cond, cond_entries
+    eq_entries = []
+    cond_entries = []
 
-    label_num_eqs = tk.Label(window, text="Número de ecuaciones diferenciales:")
-    label_num_eqs.pack(pady=10)
-    entry_num_eqs = tk.Entry(window, width=50)
-    entry_num_eqs.pack(pady=10)
-    entry_num_eqs.bind("<Return>", on_number_of_equations_change)
+    label_num_eq = tk.Label(window, text="Número de ecuaciones diferenciales:")
+    label_num_eq.pack(pady=10)
+    entry_num_eq = tk.Entry(window, width=10)
+    entry_num_eq.pack(pady=10)
+    entry_num_eq.bind("<Return>", on_num_eq_change)
 
-    frame_equations = tk.Frame(window)
-    frame_equations.pack(pady=10)
+    frame_eq = tk.Frame(window)
+    frame_eq.pack(pady=10)
 
-    label_num_conds = tk.Label(window, text="Número de condiciones iniciales:")
-    label_num_conds.pack(pady=10)
-    entry_num_conds = tk.Entry(window, width=50)
-    entry_num_conds.pack(pady=10)
-    entry_num_conds.bind("<Return>", on_number_of_conditions_change)
+    label_num_cond = tk.Label(window, text="Número de condiciones iniciales:")
+    label_num_cond.pack(pady=10)
+    entry_num_cond = tk.Entry(window, width=10)
+    entry_num_cond.pack(pady=10)
+    entry_num_cond.bind("<Return>", on_num_cond_change)
 
-    frame_conditions = tk.Frame(window)
-    frame_conditions.pack(pady=10)
+    frame_cond = tk.Frame(window)
+    frame_cond.pack(pady=10)
+
+    # Labels and entries for a, b, h
+    label_a = tk.Label(window, text="a:")
+    label_a.pack(pady=5)
+    entry_a = tk.Entry(window, width=10)
+    entry_a.pack(pady=5)
+
+    label_b = tk.Label(window, text="b:")
+    label_b.pack(pady=5)
+    entry_b = tk.Entry(window, width=10)
+    entry_b.pack(pady=5)
+
+    label_h = tk.Label(window, text="h:")
+    label_h.pack(pady=5)
+    entry_h = tk.Entry(window, width=10)
+    entry_h.pack(pady=5)
 
     label_method = tk.Label(window, text="Método:")
     label_method.pack(pady=10)
@@ -237,9 +232,18 @@ def open_differential_eq_window():
     method_combobox.pack(pady=10)
 
     save_button = tk.Button(window, text="Resolver",
-                            command=lambda: save_differential_eq(equation_entries, condition_entries,
-                                                                 method_combobox.get()))
+                            command=lambda: save_differential_eq(eq_entries, cond_entries,
+                                                                  method_combobox.get(),
+                                                                  entry_a.get(), entry_b.get(), entry_h.get()))
     save_button.pack(pady=10)
+
+# Configuración de la ventana principal
+root = tk.Tk()
+root.title("Solver de Ecuaciones Diferenciales")
+
+main_button = tk.Button(root, text="Abrir ventana de ecuaciones diferenciales", command=open_differential_eq_window)
+main_button.pack(pady=20)
+
 
 # Funciones para guardar los datos ingresados
 def save_taylor(function, x_0, degree):
@@ -279,12 +283,33 @@ def save_linear_systems(system, method, b, x0, tol):
 def save_interpolation(data, approx, method):
     print(f"Datos: {data}, Aproximación: {approx}, Método: {method}")
 
-def save_differential_eq(equations, conditions, method):
-    eqs = [entry.get() for entry in equation_entries]
-    conds = [entry.get() for entry in condition_entries]
-    # Aquí puedes procesar las ecuaciones y condiciones
-    solution =
-    show_solution_window("Solución de prueba")
+def save_differential_eq(eq_entries, cond_entries, method, a, b, h):
+    equations = [entry.get() for entry in eq_entries]
+    conditions = [float(entry.get()) for entry in cond_entries]
+    a = float(a)
+    b = float(b)
+    h = float(h)
+    match method:
+        case "Euler de orden 4":
+            t, result = ed.Euler(eq_entries, a, b, cond_entries, h)
+            grafica = ed.graficar(result,t)
+        case "Runge Kutta de orden 4":
+            t, result = ed.RungeKutta(eq_entries, a, b, h, cond_entries)
+            grafica = ed.graficar(result,t)
+        case _:
+            print("Seleccione un método correcto")
+
+        # Mostrar resultados en una nueva ventana
+    result_window = tk.Toplevel(root)
+    result_window.title("Solución")
+
+    label_result = tk.Label(result_window, text="Solución:")
+    label_result.pack(pady=10)
+
+    result_str = f"Tiempo: {t}\nY(t): {result[:, 0]}\nYp(t): {result[:, 1]}"
+    result_text = tk.Text(result_window, height=15, width=80)
+    result_text.pack(pady=10)
+    result_text.insert(tk.END, result_str)
 
 # Crear la ventana principal
 root = tk.Tk()
