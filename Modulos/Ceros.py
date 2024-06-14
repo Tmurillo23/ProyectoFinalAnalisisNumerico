@@ -12,9 +12,6 @@ def biseccion(f, a, b, tolerancia):
     #tolerancia
     #------------------
     contador = 0
-    print(f'tipo de dato de la funcion {type(f)}')
-    print(f'tipo de dato de a {type(a)}')
-    print(f'tipo de dato de b {type(b)}')
 
     if f(a)*f(b)<0:
         while abs(a-b)>tolerancia:
@@ -54,7 +51,8 @@ def pos_falsa(f, a, b, tolerancia):
                 b=c
             else:
                 a=c
-        return c, contador
+        #return c, contador
+        return c
     else:
         print("No cumple el teorema")
 
@@ -85,4 +83,5 @@ def secante(f, h0, h1,tolerancia):
         h0=h1
         h1=h2
         contador+=1
-    return h1, contador
+    #return h1, contador
+    return h1

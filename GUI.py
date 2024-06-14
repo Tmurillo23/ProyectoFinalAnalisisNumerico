@@ -110,6 +110,13 @@ def show_solution_window(solution):
     entry_solution.config(state='readonly')
     entry_solution.pack(pady=10)
 
+def show_solution_roots(solution):
+    solution_roots_window = tk.Toplevel(root)
+    solution_roots_window.title("Solución")
+
+    label_solution_roots = tk.Label(solution_roots_window, text=f"Solución:{solution}")
+    label_solution_roots.pack(pady=10)
+
 
 def on_method_change(event):
     selected_method = method_combobox.get()
@@ -268,7 +275,7 @@ class InvalidIntervalError(Exception):
 # Función para verificar que el intervalo ingresado o el valor inicial son correctos y retornarlos
 def get_interval(entry_interval, method):
     try:
-        interval = eval(entry_interval)
+        interval = eval(entry_interval, {"np":np})
     except:
         raise InvalidIntervalError("Input inválido")
 
@@ -281,6 +288,21 @@ def get_interval(entry_interval, method):
             raise InvalidIntervalError("Por favor ingrese un número válido (entero o decimal)")
         return interval
 
+class TeoremaCerosError(Exception):
+    pass
+
+def verificar_teorema(f, a, b):
+    if f(a)*f(b)>0:
+        raise TeoremaCerosError("El teorema no se cumple\nIngrese un intervalo válido")
+    
+class InvalidNumberError(Exception):
+    pass
+    
+def get_accuracy(accuracy):
+    try:
+        return float(accuracy)
+    except ValueError:
+        raise InvalidNumberError("Número inválido. Por favor ingrese un número válido (por ejemplo, 0.001 o 1e-6).")
 
 def save_zeros(function, interval, accuracy, method):
     ret_interval = get_interval(interval, method)
@@ -292,11 +314,32 @@ def save_zeros(function, interval, accuracy, method):
 
         except InvalidIntervalError as e:
             messagebox.showerror("Error", str(e))
-            return None
 
     match method:
         case "Bisección" | "Falsa Posición"| "Secante":
-            pass            
+            a = ret_interval[0]
+            b = ret_interval[1]
+            f = eval(f"lambda x: {function}", {"np": np})
+            try:
+                verificar_teorema(f, a, b)
+                tol = get_accuracy(accuracy)
+                match method:
+                    case "Bisección":
+                        sol = Modulos.Ceros.biseccion(f, a, b,tol)
+                        show_solution_roots(sol)
+                    case "Falsa Posición":
+                        sol = Modulos.Ceros.pos_falsa(f, a, b,tol)
+                        show_solution_roots(sol)
+                    case "Secante":
+                        sol = Modulos.Ceros.secante(f, a, b,tol)
+                        show_solution_roots(sol)
+
+
+            
+            except (TeoremaCerosError, InvalidNumberError) as e:
+                messagebox.showerror("Error", str(e))
+
+
         case "Newton":
             print("Newton")
         case _:
