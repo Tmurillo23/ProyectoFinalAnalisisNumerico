@@ -74,7 +74,8 @@ def Newton(f, x0, tol):
         #print(x1)
         contador+=1
     #print("La raiz es", x1)
-    return x1,contador
+    #return x1,contador
+    return x1
 
 def secante(f, h0, h1,tolerancia):
     contador = 0

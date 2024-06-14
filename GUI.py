@@ -1,6 +1,7 @@
 import ast
 import tkinter as tk
 import numpy as np
+import sympy as sp
 from tkinter import ttk
 from tkinter import messagebox
 import Modulos
@@ -287,6 +288,7 @@ def get_interval(entry_interval, method):
         if not (isinstance(interval,(int, float))):
             raise InvalidIntervalError("Por favor ingrese un número válido (entero o decimal)")
         return interval
+    
 
 class TeoremaCerosError(Exception):
     pass
@@ -297,53 +299,65 @@ def verificar_teorema(f, a, b):
     
 class InvalidNumberError(Exception):
     pass
+
+class InvalidSPFunctionError(Exception):
+    pass
     
 def get_accuracy(accuracy):
     try:
         return float(accuracy)
     except ValueError:
-        raise InvalidNumberError("Número inválido. Por favor ingrese un número válido (por ejemplo, 0.001 o 1e-6).")
+        raise InvalidNumberError("Toleracia inválida. Por favor ingrese un número válido (por ejemplo, 0.001 o 1e-6).")
+
+x = sp.symbols('x')    
+
+def get_sympy_f(function):
+    try:
+        f_sympy = sp.sympify(function, locals={'x':x, 'sp':sp})
+        if not isinstance(f_sympy, sp.core.basic.Basic):
+            raise InvalidSPFunctionError("La expresión no es un tipo SymPy válido.")
+        return f_sympy
+    except Exception as e:
+        raise InvalidSPFunctionError(f"Función inválida. Por favor ingrese una función matemática válida. Error: {str(e)}")
+
+   
 
 def save_zeros(function, interval, accuracy, method):
-    ret_interval = get_interval(interval, method)
-    
-    while True:
-        try:
-            ret_interval = get_interval(interval, method)
-            break
-
-        except InvalidIntervalError as e:
-            messagebox.showerror("Error", str(e))
-
-    match method:
-        case "Bisección" | "Falsa Posición"| "Secante":
-            a = ret_interval[0]
-            b = ret_interval[1]
-            f = eval(f"lambda x: {function}", {"np": np})
-            try:
-                verificar_teorema(f, a, b)
-                tol = get_accuracy(accuracy)
-                match method:
-                    case "Bisección":
-                        sol = Modulos.Ceros.biseccion(f, a, b,tol)
-                        show_solution_roots(sol)
-                    case "Falsa Posición":
-                        sol = Modulos.Ceros.pos_falsa(f, a, b,tol)
-                        show_solution_roots(sol)
-                    case "Secante":
-                        sol = Modulos.Ceros.secante(f, a, b,tol)
-                        show_solution_roots(sol)
-
-
-            
-            except (TeoremaCerosError, InvalidNumberError) as e:
-                messagebox.showerror("Error", str(e))
-
-
-        case "Newton":
-            print("Newton")
-        case _:
-            messagebox.showerror("Error", "Seleccione un método válido.")
+    try:
+        ret_interval = get_interval(interval, method)
+        tol = get_accuracy(accuracy)
+        match method:
+            case "Bisección" | "Falsa Posición"| "Secante":
+                a = ret_interval[0]
+                b = ret_interval[1]
+                f = eval(f"lambda x: {function}", {"np": np})
+                try:
+                    verificar_teorema(f, a, b)
+                    
+                    match method:
+                        case "Bisección":
+                            sol = Modulos.Ceros.biseccion(f, a, b,tol)
+                            show_solution_roots(sol)
+                        case "Falsa Posición":
+                            sol = Modulos.Ceros.pos_falsa(f, a, b,tol)
+                            show_solution_roots(sol)
+                        case "Secante":
+                            sol = Modulos.Ceros.secante(f, a, b,tol)
+                            show_solution_roots(sol)
+                except TeoremaCerosError as e:
+                    messagebox.showerror("Error", str(e))
+            case "Newton":
+                try:
+                    f_sympy = get_sympy_f(function)
+                    sol = Modulos.Ceros.Newton(f_sympy,ret_interval, tol)
+                    show_solution_roots(sol)
+                except InvalidSPFunctionError as e:
+                    messagebox.showerror("Error", str(e))
+            case _:
+                messagebox.showerror("Error", "Seleccione un método válido.")
+    except (InvalidIntervalError,InvalidNumberError) as e:
+        messagebox.showerror("Error", str(e))
+        
 
 
 def save_linear_systems(system, method, b, x0, tol):
