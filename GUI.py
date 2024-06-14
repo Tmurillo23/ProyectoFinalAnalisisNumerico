@@ -320,7 +320,7 @@ def save_taylor(function, x_0, degree):
     result_window.title("Resultado de la Serie de Taylor")
     result_label = tk.Label(result_window, text=f"Función: {poli}\nGrado: {degree}")
     result_label.pack(pady=10)
-    grafica = sr.grafica_polinomio(function, float(x_0), 1, int(degree))
+    grafica = sr.grafica_polinomio(function, float(x_0), float(x_0) +1, int(degree))
 
 
 class InvalidIntervalError(Exception):
@@ -398,6 +398,8 @@ def save_zeros(function, interval, accuracy, method):
                     show_solution_roots(sol, sp.lambdify(x,f_sympy))
                 except InvalidSPFunctionError as e:
                     messagebox.showerror("Error", str(e))
+                except ZeroDivisionError:
+                    messagebox.showerror("Error", "la función es inválida para el método de Newton")
             case _:
                 messagebox.showerror("Error", "Seleccione un método válido.")
     except (InvalidIntervalError,InvalidNumberError) as e:
