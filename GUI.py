@@ -446,15 +446,6 @@ def format_polynomial(coefficients):
     except Exception as e:
         raise InvalidCoefficientsError(f"Error al formatear los coeficientes del polinomio. Error: {str(e)}")
 
-'''
-def format_polynomial(coefficients):
-    try:
-        polynomial = sp.Poly(coefficients[::-1], x)  # coefficients[::-1] to reverse the order for Poly
-        return sp.pretty(polynomial)
-    except Exception as e:
-        raise InvalidCoefficientsError(f"Error al formatear los coeficientes del polinomio. Error: {str(e)}")
-'''
-
 
 def save_interpolation(data_x, data_y, approx, method):
     try:
@@ -483,7 +474,7 @@ def save_interpolation(data_x, data_y, approx, method):
                 poly = i_a.Pol_lagrange(data_x, data_y)
                 P_x = sp.lambdify(x, poly)
                 dato_aproximado = P_x(float(approx))
-                polynomial_str = sp.pretty(poly)
+                polynomial_str = sp.latex(poly)
                 #print(polynomial_str)
                 show_solution_int_ajuste(polynomial_str, dato_aproximado)
 
