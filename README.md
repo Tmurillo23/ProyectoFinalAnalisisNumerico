@@ -31,7 +31,7 @@ Es el archivo donde se realizó toda la lógica de la interfaz gráfica.
 Para poder ejecutar este programa el computador debe tener instalado: 
 - Sympy
 - Numpy
-
+- Matplotlib
 En caso de que no venga por defecto en su instalación de python, también se debe instalar tkinter.
 
 
