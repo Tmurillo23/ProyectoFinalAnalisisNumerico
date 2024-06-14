@@ -132,6 +132,20 @@ def show_solution_int_ajuste(polinomio, aproximacion):
     text=f"La aproximación es y = {aproximacion}")
     label_approx_int_ajuste.pack(pady=10)
 
+
+def show_solution_min_c(intercept, slope_min_c, aproximacion):
+    solution_min_c_window = tk.Toplevel(root)
+    solution_min_c_window.title("Solución")
+
+    label_solution_min_c = tk.Label(solution_min_c_window, 
+    text=f"Solución:{intercept}+ ({slope_min_c})x")
+    label_solution_min_c.pack(pady=10)
+
+    label_approx_min_c = tk.Label(solution_min_c_window, 
+    text=f"La aproximación es y = {aproximacion}")
+    label_approx_min_c.pack(pady=10)
+
+
 def on_method_change(event):
     selected_method = method_combobox.get()
     if selected_method == "Gauss Seidel":
@@ -264,6 +278,15 @@ def open_differential_eq_window():
                                                                   entry_a.get(), entry_b.get(), entry_h.get()))
     save_button.pack(pady=10)
 
+def get_sympy_f(function):
+    try:
+        f_sympy = sp.sympify(function, locals={'x':x, 'sp':sp})
+        if not isinstance(f_sympy, sp.core.basic.Basic):
+            raise InvalidSPFunctionError("La expresión no es un tipo SymPy válido.")
+        return f_sympy
+    except Exception as e:
+        raise InvalidSPFunctionError(f"Función inválida. Por favor ingrese una función matemática válida. Error: {str(e)}")
+
 
 # Funciones para guardar los datos ingresados
 def save_taylor(function, x_0, degree):
@@ -275,6 +298,7 @@ def save_taylor(function, x_0, degree):
         return
 
     try:
+        function = get_sympy_f(function)
         poli = sr.S_taylor(function, float(x_0), int(degree))
     except Exception as e:
         messagebox.showerror("Error", f"Se produjo un error al calcular la serie de Taylor: {e}")
@@ -328,14 +352,6 @@ def get_accuracy(accuracy):
 
 x = sp.symbols('x')    
 
-def get_sympy_f(function):
-    try:
-        f_sympy = sp.sympify(function, locals={'x':x, 'sp':sp})
-        if not isinstance(f_sympy, sp.core.basic.Basic):
-            raise InvalidSPFunctionError("La expresión no es un tipo SymPy válido.")
-        return f_sympy
-    except Exception as e:
-        raise InvalidSPFunctionError(f"Función inválida. Por favor ingrese una función matemática válida. Error: {str(e)}")
 
    
 
@@ -424,11 +440,20 @@ class InvalidCoefficientsError(Exception):
 
 def format_polynomial(coefficients):
     try:
+        polynomial = sum(coef * x**i for i, coef in enumerate(coefficients))
+        return polynomial
+        #return sp.pretty(polynomial)
+    except Exception as e:
+        raise InvalidCoefficientsError(f"Error al formatear los coeficientes del polinomio. Error: {str(e)}")
+
+'''
+def format_polynomial(coefficients):
+    try:
         polynomial = sp.Poly(coefficients[::-1], x)  # coefficients[::-1] to reverse the order for Poly
         return sp.pretty(polynomial)
     except Exception as e:
         raise InvalidCoefficientsError(f"Error al formatear los coeficientes del polinomio. Error: {str(e)}")
-
+'''
 
 
 def save_interpolation(data_x, data_y, approx, method):
@@ -449,17 +474,23 @@ def save_interpolation(data_x, data_y, approx, method):
                 try:
                     coefficients = i_a.Pol_simple(data_x, data_y)
                     dato_aproximado = i_a.Poly(coefficients, float(approx))
-                    show_solution_int_ajuste(coefficients, dato_aproximado)
-                    #polynomial_str = format_polynomial(coefficients)
+                    polynomial_str = format_polynomial(coefficients)
+                    show_solution_int_ajuste(polynomial_str, dato_aproximado)
                     #how_solution_int_ajuste(format_polynomial)
                 except InvalidCoefficientsError as e:
                     messagebox.showerror("Error", str(e))
             case "Lagrange":
-                coefficients = i_a.Pol_lagrange(data_x, data_y)
+                poly = i_a.Pol_lagrange(data_x, data_y)
+                P_x = sp.lambdify(x, poly)
+                dato_aproximado = P_x(float(approx))
+                polynomial_str = sp.pretty(poly)
+                #print(polynomial_str)
+                show_solution_int_ajuste(polynomial_str, dato_aproximado)
 
             case "Mínimos cuadrados":
                 intercept, slope_min_c = i_a.min_c(data_x, data_y)
                 dato_aproximado = intercept + slope_min_c*float(approx)
+                show_solution_min_c(intercept, slope_min_c, dato_aproximado)
             case _:
                 messagebox.showerror("Error", "Seleccione un método válido.")
     except (ValueError, SyntaxError):
