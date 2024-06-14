@@ -61,7 +61,7 @@ Grafica del polinomio vs la función
 
 def grafica_polinomio(f,x0,xp,n):
     x = symbols('x')
-    w = np.linspace(x0, xp, 100)
+    w = np.linspace(x0, xp+1, 100)
     P = S_taylor(f, x0, n)
 
     custom_funcs = {'acos': np.arccos, 'cos': np.cos, 'sin': np.sin, 'log': np.log, 'exp': np.exp}
