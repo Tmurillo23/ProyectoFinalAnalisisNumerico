@@ -16,86 +16,91 @@ from Modulos import ecuaciones_diferenciales as ed
 def open_taylor_window():
     window = tk.Toplevel(root)
     window.title("Serie de Taylor")
-    label = tk.Label(window, text="La función en x_0 ")
+
+    label = tk.Label(window, text="Ingrese la función: ",font = ("Helvetica", 14))
     label.pack(pady=10)
-    entry_function = tk.Entry(window, width=50)
+    entry_function = tk.Entry(window, width=50,font=("Helvetica", 14))
     entry_function.pack(pady=10)
-    label_x0 = tk.Label(window, text="X_0")
+
+    label_x0 = tk.Label(window, text="Ingrese el valor de x0:",font=("Helvetica", 14))
     label_x0.pack(pady=10)
-    entry_x0 = tk.Entry(window, width=50)
+    entry_x0 = tk.Entry(window, width=50,font=("Helvetica", 14))
     entry_x0.pack(pady=10)
-    label_degree = tk.Label(window, text="Grado del polinomio:")
+
+    label_degree = tk.Label(window, text="Ingrese el grado del polinomio:", font=("Helvetica", 14))
     label_degree.pack(pady=10)
-    entry_degree = tk.Entry(window, width=50)
+    entry_degree = tk.Entry(window, width=50,font=("Helvetica", 14))
     entry_degree.pack(pady=10)
+
     save_button = tk.Button(window, text="Calcular",
+                            font=("Helvetica", 14),
                             command=lambda: save_taylor(entry_function.get(), entry_x0.get(), entry_degree.get()))
-    save_button.pack(pady=10)
+    save_button.pack(pady=20)
 
 
 def open_zeros_window():
     window = tk.Toplevel(root)
     window.title("Ceros de Funciones")
 
-    label = tk.Label(window, text="Función:")
-    label.pack(pady=10)
-    entry_function = tk.Entry(window, width=50)
+    label_function = tk.Label(window, text="Ingrese la función:",font=("Helvetica", 14))
+    label_function.pack(pady=10)
+    entry_function = tk.Entry(window, width=50,font=("Helvetica", 14))
     entry_function.pack(pady=10)
 
     label_interval = tk.Label(window,
-                              text="Intervalo (si el método es diferente de Newton, ingréselo como una lista [a,b])\n o dato inicial (si el método es Newton, ingréselo como un valor normal):")
+                              text="Intervalo (si el método es diferente de Newton, ingréselo como una lista [a,b])\n o dato inicial (si el método es Newton, ingréselo como un valor normal):",font=("Helvetica", 12))
     label_interval.pack(pady=10)
-    entry_interval = tk.Entry(window, width=50)
+    entry_interval = tk.Entry(window, width=50,font=("Helvetica", 14))
     entry_interval.pack(pady=10)
 
-    label_accuracy = tk.Label(window, text="Exactitud:")
+    label_accuracy = tk.Label(window, text="Exactitud:", font=("Helvetica", 14))
     label_accuracy.pack(pady=10)
-    entry_accuracy = tk.Entry(window, width=50)
+    entry_accuracy = tk.Entry(window, width=50, font=("Helvetica", 14))
     entry_accuracy.pack(pady=10)
 
-    label_method = tk.Label(window, text="Método:")
+    label_method = tk.Label(window, text="Método:", font=("Helvetica", 14))
     label_method.pack(pady=10)
     methods = ["Bisección", "Newton", "Falsa Posición", "Secante"]
-    method_combobox = ttk.Combobox(window, values=methods)
+    method_combobox = ttk.Combobox(window, values=methods, font=("Helvetica", 14))
     method_combobox.pack(pady=10)
 
-    save_button = tk.Button(window, text="Calcular",
+    save_button = tk.Button(window, text="Calcular",font= ("Helvetica", 14),
                             command=lambda: save_zeros(entry_function.get(), entry_interval.get(), entry_accuracy.get(),
                                                        method_combobox.get()))
-    save_button.pack(pady=10)
+    save_button.pack(pady=20)
 
 
 def open_linear_systems_window():
     window = tk.Toplevel(root)
     window.title("Sistemas de Ecuaciones Lineales")
 
-    label = tk.Label(window, text="Ingrese el sistema de ecuaciones lineales:")
+    label = tk.Label(window, text="Ingrese el sistema de ecuaciones lineales:",font=("Helvetica", 14))
     label.pack(pady=10)
-    entry_system = tk.Entry(window, width=50)
+    entry_system = tk.Entry(window, width=50, font=("Helvetica", 14))
     entry_system.pack(pady=10)
 
-    label_b = tk.Label(window, text="Ingrese la matriz b:")
+    label_b = tk.Label(window, text="Ingrese la matriz b:",font=("Helvetica", 14))
     label_b.pack(pady=10)
-    entry_b = tk.Entry(window, width=50)
+    entry_b = tk.Entry(window, width=50,font=("Helvetica", 14))
     entry_b.pack(pady=10)
 
-    label_method = tk.Label(window, text="Ingrese el método:")
+    label_method = tk.Label(window, text="Ingrese el método:", font=("Helvetica", 14))
     label_method.pack(pady=10)
     methods = ["Eliminación Gaussiana", "Pivoteo", "Gauss Seidel"]
     global method_combobox
-    method_combobox = ttk.Combobox(window, values=methods)
+    method_combobox = ttk.Combobox(window, values=methods, font=("Helvetica", 14))
     method_combobox.pack(pady=10)
     method_combobox.bind("<<ComboboxSelected>>", on_method_change)
 
     global label_x0, entry_x0, label_tol, entry_tol
 
-    label_x0 = tk.Label(window, text="Ingrese el vector x0:")
-    entry_x0 = tk.Entry(window, width=50)
+    label_x0 = tk.Label(window, text="Ingrese el vector x0:", font=("Helvetica", 14))
+    entry_x0 = tk.Entry(window, width=50, font=("Helvetica", 14))
 
-    label_tol = tk.Label(window, text="Ingrese la tolerancia:")
-    entry_tol = tk.Entry(window, width=50)
+    label_tol = tk.Label(window, text="Ingrese la tolerancia:", font=("Helvetica", 14))
+    entry_tol = tk.Entry(window, width=50, font=("Helvetica", 14))
 
-    save_button = tk.Button(window, text="Resolver", command=lambda: save_linear_systems(entry_system.get(), method_combobox.get(), entry_b.get(), entry_x0.get(), entry_tol.get()))
+    save_button = tk.Button(window, text="Resolver", font=("Helvetica", 14), command=lambda: save_linear_systems(entry_system.get(), method_combobox.get(), entry_b.get(), entry_x0.get(), entry_tol.get()))
     save_button.pack(pady=10, side=tk.BOTTOM)
 
 
@@ -103,11 +108,11 @@ def show_solution_window(solution):
     solution_window = tk.Toplevel(root)
     solution_window.title("Solución")
 
-    label_solution = tk.Label(solution_window, text="Solución:")
+    label_solution = tk.Label(solution_window, text="Solución:", font=("Helvetica", 14))
     label_solution.pack(pady=10)
 
     solution_str = ', '.join([str(s) for s in solution])
-    entry_solution = tk.Entry(solution_window, width=50)
+    entry_solution = tk.Entry(solution_window, width=50, font=("Helvetica", 14))
     entry_solution.insert(0, solution_str)
     entry_solution.config(state='readonly')
     entry_solution.pack(pady=10)
@@ -116,10 +121,10 @@ def show_solution_roots(solution, funcion):
     solution_roots_window = tk.Toplevel(root)
     solution_roots_window.title("Solución")
 
-    label_solution_roots = tk.Label(solution_roots_window, text=f"Solución: x = {solution}")
+    label_solution_roots = tk.Label(solution_roots_window, text=f"Solución: x = {solution}", font=("Helvetica", 14))
     label_solution_roots.pack(pady=10)
 
-    plot_button = tk.Button(solution_roots_window, text="Ver gráfica", command=lambda: graficar_ceros(solution, funcion))
+    plot_button = tk.Button(solution_roots_window, text="Ver gráfica", font=("Helvetica", 14), command=lambda: graficar_ceros(solution, funcion))
     plot_button.pack(pady=10, side=tk.BOTTOM)
 
 def graficar_ceros(solution, funcion):
@@ -131,12 +136,12 @@ def show_solution_int_ajuste(polinomio, aproximacion):
     solution_int_ajuste_window.title("Solución")
 
     label_solution_int_ajuste = tk.Label(solution_int_ajuste_window, 
-    text=f"Solución:{polinomio}")
+    text=f"Solución:{polinomio}", font=("Helvetica", 14))
     label_solution_int_ajuste.config(text= f"Polinomio: {polinomio}")
     label_solution_int_ajuste.pack(pady=10)
 
     label_approx_int_ajuste = tk.Label(solution_int_ajuste_window, 
-    text=f"La aproximación es y = {aproximacion}")
+    text=f"La aproximación es y = {aproximacion}", font=("Helvetica", 14))
     label_approx_int_ajuste.pack(pady=10)
 
 
@@ -145,11 +150,11 @@ def show_solution_min_c(intercept, slope_min_c, aproximacion):
     solution_min_c_window.title("Solución")
 
     label_solution_min_c = tk.Label(solution_min_c_window, 
-    text=f"Solución:{intercept}+ ({slope_min_c})x")
+    text=f"Solución:{intercept}+ ({slope_min_c})x", font=("Helvetica", 14))
     label_solution_min_c.pack(pady=10)
 
     label_approx_min_c = tk.Label(solution_min_c_window, 
-    text=f"La aproximación es y = {aproximacion}")
+    text=f"La aproximación es y = {aproximacion}", font=("Helvetica", 14))
     label_approx_min_c.pack(pady=10)
 
 
@@ -170,28 +175,28 @@ def open_interpolation_window():
     window = tk.Toplevel(root)
     window.title("Interpolación y ajuste")
 
-    label_datos_x = tk.Label(window, text="Datos (x)\n Por favor ingréselos como una lista [x1, x2, ...]")
+    label_datos_x = tk.Label(window, text="Datos (x)\n Por favor ingréselos como una lista [x1, x2, ...]",font=("Helvetica", 14))
     label_datos_x.pack(pady=10)
-    entry_datos_x = tk.Entry(window, width=50)
+    entry_datos_x = tk.Entry(window, width=50,font=("Helvetica", 14))
     entry_datos_x.pack(pady=10)
 
-    label_datos_y = tk.Label(window, text="Datos (y)\n Por favor ingréselos como una lista [x1, x2, ...]")
+    label_datos_y = tk.Label(window, text="Datos (y)\n Por favor ingréselos como una lista [y1, y2, ...]",font=("Helvetica", 14))
     label_datos_y.pack(pady=10)
-    entry_datos_y = tk.Entry(window, width=50)
+    entry_datos_y = tk.Entry(window, width=50,font=("Helvetica", 14))
     entry_datos_y.pack(pady=10)
 
-    label_approx = tk.Label(window, text="Dato que se desea aproximar:")
+    label_approx = tk.Label(window, text="Dato que se desea aproximar:", font=("Helvetica", 14))
     label_approx.pack(pady=10)
-    entry_approx = tk.Entry(window, width=50)
+    entry_approx = tk.Entry(window, width=50,font=("Helvetica", 14))
     entry_approx.pack(pady=10)
 
-    label_method = tk.Label(window, text="Método:")
+    label_method = tk.Label(window, text="Método:",font=("Helvetica", 14))
     label_method.pack(pady=10)
     methods = ["Polinomial simple", "Lagrange", "Mínimos cuadrados"]
-    method_combobox = ttk.Combobox(window, values=methods)
+    method_combobox = ttk.Combobox(window, values=methods, font=("Helvetica", 14))
     method_combobox.pack(pady=10)
 
-    save_button = tk.Button(window, text="Calcular",
+    save_button = tk.Button(window, text="Calcular",font=("Helvetica", 14),
                             command=lambda: save_interpolation(entry_datos_x.get(), entry_datos_y.get(), entry_approx.get(), method_combobox.get()))
     save_button.pack(pady=10)
 
@@ -201,7 +206,7 @@ def on_num_eq_change(event):
         if num_eq <= 0:
             raise ValueError("El número de ecuaciones debe ser un entero positivo.")
     except ValueError as e:
-        messagebox.showerror("Error", str(e))
+        messagebox.showerror("Error", str(e), font=("Helvetica", 14))
         return
 
     for widget in frame_eq.winfo_children():
@@ -239,18 +244,18 @@ def open_differential_eq_window():
     eq_entries = []
     cond_entries = []
 
-    label_num_eq = tk.Label(window, text="Número de ecuaciones diferenciales:")
+    label_num_eq = tk.Label(window, text="Número de ecuaciones diferenciales:", font=("Helvetica", 14))
     label_num_eq.pack(pady=10)
-    entry_num_eq = tk.Entry(window, width=10)
+    entry_num_eq = tk.Entry(window, width=10,font=("Helvetica", 14))
     entry_num_eq.pack(pady=10)
     entry_num_eq.bind("<Return>", on_num_eq_change)
 
     frame_eq = tk.Frame(window)
     frame_eq.pack(pady=10)
 
-    label_num_cond = tk.Label(window, text="Número de condiciones iniciales:")
+    label_num_cond = tk.Label(window, text="Número de condiciones iniciales:",font=("Helvetica", 14))
     label_num_cond.pack(pady=10)
-    entry_num_cond = tk.Entry(window, width=10)
+    entry_num_cond = tk.Entry(window, width=10,font=("Helvetica", 14))
     entry_num_cond.pack(pady=10)
     entry_num_cond.bind("<Return>", on_num_cond_change)
 
@@ -258,28 +263,28 @@ def open_differential_eq_window():
     frame_cond.pack(pady=10)
 
     # Labels and entries for a, b, h
-    label_a = tk.Label(window, text="a:")
+    label_a = tk.Label(window, text="a:",font=("Helvetica", 14))
     label_a.pack(pady=5)
-    entry_a = tk.Entry(window, width=10)
+    entry_a = tk.Entry(window, width=10,font=("Helvetica", 14))
     entry_a.pack(pady=5)
 
-    label_b = tk.Label(window, text="b:")
+    label_b = tk.Label(window, text="b:",font=("Helvetica", 14))
     label_b.pack(pady=5)
-    entry_b = tk.Entry(window, width=10)
+    entry_b = tk.Entry(window, width=10, font=("Helvetica", 14))
     entry_b.pack(pady=5)
 
-    label_h = tk.Label(window, text="h:")
+    label_h = tk.Label(window, text="h:", font=("Helvetica", 14))
     label_h.pack(pady=5)
-    entry_h = tk.Entry(window, width=10)
+    entry_h = tk.Entry(window, width=10, font=("Helvetica", 14))
     entry_h.pack(pady=5)
 
-    label_method = tk.Label(window, text="Método:")
+    label_method = tk.Label(window, text="Método:", font=("Helvetica", 14))
     label_method.pack(pady=10)
     methods = ["Euler de orden 4", "Runge Kutta de orden 4"]
-    method_combobox = ttk.Combobox(window, values=methods)
+    method_combobox = ttk.Combobox(window, values=methods, font=("Helvetica", 14))
     method_combobox.pack(pady=10)
 
-    save_button = tk.Button(window, text="Resolver",
+    save_button = tk.Button(window, text="Resolver",font=("Helvetica", 14),
                             command=lambda: save_differential_eq(eq_entries, cond_entries,
                                                                   method_combobox.get(),
                                                                   entry_a.get(), entry_b.get(), entry_h.get()))
@@ -545,7 +550,7 @@ root = tk.Tk()
 root.title("Interfaz Principal")
 
 # Crear un marco para los botones
-frame = ttk.Frame(root, padding="10")
+frame = ttk.Frame(root, padding="20")
 frame.grid(row=0, column=0, sticky=(tk.W, tk.E))
 
 # Lista de textos para los botones
@@ -559,7 +564,7 @@ button_texts = [
 
 # Crear los botones con textos encima
 for i, (text, command) in enumerate(button_texts):
-    button = tk.Button(frame, text=text, command=command)
+    button = tk.Button(frame, text=text,font=("Helvetica", 14), command=command)
     button.grid(row=i, column=0, pady=5, padx=10, sticky=(tk.W, tk.E))
 
 # Iniciar el bucle principal de la interfaz gráfica
