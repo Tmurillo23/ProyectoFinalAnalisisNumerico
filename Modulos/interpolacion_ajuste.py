@@ -1,5 +1,6 @@
 # Polinomial simple
 
+import sympy as sp
 import numpy as np
 
 def Gauss_s(A,b,xo,tol):
@@ -59,6 +60,25 @@ def Poly(a_i,ux):
         P=P+a_i[i]*ux**i
         
     return P
+
+
+
+
+x = sp.symbols('x')
+
+def Pol_lagrange(x_d, y_d):
+    #se calcula la suma y la productoria
+    n = len(x_d)
+    S = 0 #contador de la suma
+    for i in range(n):
+        pr = 1 #contador de la productoria
+        for j in range(n):
+            if (j!=i):
+                pr = pr*((x-x_d[j])/(x_d[i]-x_d[j]))
+        S = S + pr*y_d[i]
+        #print(S)
+    return(S.expand()) #retorna el polinomio simplificado para comparar con polinomial simple
+
 
 
 #minimos cuadrados

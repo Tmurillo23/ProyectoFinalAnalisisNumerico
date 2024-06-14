@@ -6,6 +6,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import Modulos
 from Modulos import serie as sr
+from Modulos import interpolacion_ajuste as i_a
 from Modulos import sistemas_ecuaciones_lineales as se
 import Modulos.Ceros
 from Modulos import ecuaciones_diferenciales as ed
@@ -118,6 +119,18 @@ def show_solution_roots(solution):
     label_solution_roots = tk.Label(solution_roots_window, text=f"Solución:{solution}")
     label_solution_roots.pack(pady=10)
 
+def show_solution_int_ajuste(polinomio, aproximacion):
+    solution_int_ajuste_window = tk.Toplevel(root)
+    solution_int_ajuste_window.title("Solución")
+
+    label_solution_int_ajuste = tk.Label(solution_int_ajuste_window, 
+    text=f"Solución:{polinomio}")
+    label_solution_int_ajuste.config(text= f"Polinomio: {polinomio}")
+    label_solution_int_ajuste.pack(pady=10)
+
+    label_approx_int_ajuste = tk.Label(solution_int_ajuste_window, 
+    text=f"La aproximación es y = {aproximacion}")
+    label_approx_int_ajuste.pack(pady=10)
 
 def on_method_change(event):
     selected_method = method_combobox.get()
@@ -136,10 +149,15 @@ def open_interpolation_window():
     window = tk.Toplevel(root)
     window.title("Interpolación y ajuste")
 
-    label = tk.Label(window, text="Datos:")
-    label.pack(pady=10)
-    entry_data = tk.Entry(window, width=50)
-    entry_data.pack(pady=10)
+    label_datos_x = tk.Label(window, text="Datos (x)\n Por favor ingréselos como una lista [x1, x2, ...]")
+    label_datos_x.pack(pady=10)
+    entry_datos_x = tk.Entry(window, width=50)
+    entry_datos_x.pack(pady=10)
+
+    label_datos_y = tk.Label(window, text="Datos (y)\n Por favor ingréselos como una lista [x1, x2, ...]")
+    label_datos_y.pack(pady=10)
+    entry_datos_y = tk.Entry(window, width=50)
+    entry_datos_y.pack(pady=10)
 
     label_approx = tk.Label(window, text="Dato que se desea aproximar:")
     label_approx.pack(pady=10)
@@ -153,8 +171,7 @@ def open_interpolation_window():
     method_combobox.pack(pady=10)
 
     save_button = tk.Button(window, text="Calcular",
-                            command=lambda: save_interpolation(entry_data.get(), entry_approx.get(),
-                                                               method_combobox.get()))
+                            command=lambda: save_interpolation(entry_datos_x.get(), entry_datos_y.get(), entry_approx.get(), method_combobox.get()))
     save_button.pack(pady=10)
 
 def on_num_eq_change(event):
@@ -398,31 +415,58 @@ def save_linear_systems(system, method, b, x0, tol):
         case _:
             messagebox.showerror("Error", "Seleccione un método válido.")
 
+#error cuando los datos de x, y tienen diferentes tamaños
+class SizeYXError(Exception):
+    pass
 
-def save_interpolation(data, approx, method):
-    try:
-        data = ast.literal_eval(data)
-        if not isinstance(data, list):
-            raise ValueError
-    except (ValueError, SyntaxError):
-        messagebox.showerror("Error", "Por favor ingrese una lista válida para los datos.")
-        return
+class InvalidCoefficientsError(Exception):
+    pass
 
+def format_polynomial(coefficients):
     try:
+        polynomial = sp.Poly(coefficients[::-1], x)  # coefficients[::-1] to reverse the order for Poly
+        return sp.pretty(polynomial)
+    except Exception as e:
+        raise InvalidCoefficientsError(f"Error al formatear los coeficientes del polinomio. Error: {str(e)}")
+
+
+
+def save_interpolation(data_x, data_y, approx, method):
+    try:
+        data_x = ast.literal_eval(data_x)
+        data_y = ast.literal_eval(data_y)
         approx = float(approx)
-    except ValueError:
-        messagebox.showerror("Error", "Por favor ingrese un valor numérico válido para la aproximación.")
-        return
+        if (not isinstance(data_x, list)) or (not isinstance(data_y, list)):
+            raise ValueError
+        if not len(data_x)==len(data_y):
+            raise(SizeYXError)
+        
+        data_x = np.array(data_x)
+        data_y = np.array(data_y)
+        
+        match method:
+            case "Polinomial simple":
+                try:
+                    coefficients = i_a.Pol_simple(data_x, data_y)
+                    dato_aproximado = i_a.Poly(coefficients, float(approx))
+                    show_solution_int_ajuste(coefficients, dato_aproximado)
+                    #polynomial_str = format_polynomial(coefficients)
+                    #how_solution_int_ajuste(format_polynomial)
+                except InvalidCoefficientsError as e:
+                    messagebox.showerror("Error", str(e))
+            case "Lagrange":
+                coefficients = i_a.Pol_lagrange(data_x, data_y)
 
-    match method:
-        case "Polinomial simple":
-            pass
-        case "Lagrange":
-            pass
-        case "Mínimos cuadrados":
-            pass
-        case _:
-            messagebox.showerror("Error", "Seleccione un método válido.")
+            case "Mínimos cuadrados":
+                intercept, slope_min_c = i_a.min_c(data_x, data_y)
+                dato_aproximado = intercept + slope_min_c*float(approx)
+            case _:
+                messagebox.showerror("Error", "Seleccione un método válido.")
+    except (ValueError, SyntaxError):
+        messagebox.showerror("Error", "Por favor ingrese datos válidos.")
+    except (SizeYXError):
+        messagebox.showerror("Error", "los datos de x y y debe tener el mismo tamaño")
+    
 
 
 def save_differential_eq(eq_entries, cond_entries, method, a, b, h):
