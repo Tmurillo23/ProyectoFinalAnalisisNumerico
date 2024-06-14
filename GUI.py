@@ -112,12 +112,19 @@ def show_solution_window(solution):
     entry_solution.config(state='readonly')
     entry_solution.pack(pady=10)
 
-def show_solution_roots(solution):
+def show_solution_roots(solution, funcion):
     solution_roots_window = tk.Toplevel(root)
     solution_roots_window.title("Solución")
 
-    label_solution_roots = tk.Label(solution_roots_window, text=f"Solución:{solution}")
+    label_solution_roots = tk.Label(solution_roots_window, text=f"Solución: x = {solution}")
     label_solution_roots.pack(pady=10)
+
+    plot_button = tk.Button(solution_roots_window, text="Ver gráfica", command=lambda: graficar_ceros(solution, funcion))
+    plot_button.pack(pady=10, side=tk.BOTTOM)
+
+def graficar_ceros(solution, funcion):
+    Modulos.Ceros.graficar_ceros(solution, funcion)
+
 
 def show_solution_int_ajuste(polinomio, aproximacion):
     solution_int_ajuste_window = tk.Toplevel(root)
@@ -370,20 +377,20 @@ def save_zeros(function, interval, accuracy, method):
                     match method:
                         case "Bisección":
                             sol = Modulos.Ceros.biseccion(f, a, b,tol)
-                            show_solution_roots(sol)
+                            show_solution_roots(sol,f)
                         case "Falsa Posición":
                             sol = Modulos.Ceros.pos_falsa(f, a, b,tol)
-                            show_solution_roots(sol)
+                            show_solution_roots(sol,f)
                         case "Secante":
                             sol = Modulos.Ceros.secante(f, a, b,tol)
-                            show_solution_roots(sol)
+                            show_solution_roots(sol,f)
                 except TeoremaCerosError as e:
                     messagebox.showerror("Error", str(e))
             case "Newton":
                 try:
                     f_sympy = get_sympy_f(function)
                     sol = Modulos.Ceros.Newton(f_sympy,ret_interval, tol)
-                    show_solution_roots(sol)
+                    show_solution_roots(sol, sp.lambdify(x,f_sympy))
                 except InvalidSPFunctionError as e:
                     messagebox.showerror("Error", str(e))
             case _:

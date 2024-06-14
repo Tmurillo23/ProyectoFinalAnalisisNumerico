@@ -1,6 +1,7 @@
 import numpy as np
 
 import sympy as sp
+import matplotlib.pyplot as plt
 
 x = sp.symbols("x")
 
@@ -86,3 +87,12 @@ def secante(f, h0, h1,tolerancia):
         contador+=1
     #return h1, contador
     return h1
+
+def graficar_ceros(solution, function):
+    x_values = np.linspace(solution - 1, solution + 1, 400)
+    plt.plot(x_values, function(x_values), label=f'f(x)')
+    plt.axhline(0, color='green')
+    plt.plot(solution, function(solution), '*', label = 'raíz')
+    plt.grid()
+    plt.legend()
+    plt.show()
