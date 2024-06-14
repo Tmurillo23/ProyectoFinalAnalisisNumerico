@@ -32,6 +32,7 @@ Para poder ejecutar este programa el computador debe tener instalado:
 - Sympy
 - Numpy
 - Matplotlib
+  
 En caso de que no venga por defecto en su instalación de python, también se debe instalar tkinter.
 
 
